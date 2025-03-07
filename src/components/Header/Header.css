@@ -1,16 +1,18 @@
 /* HEADER */
 .header {
-    width: 100%;
-    text-align: right;
-    position: fixed; /* Fijar en la parte superior */
-    top: 0;
-    left: 0;
-    z-index: 1000; /* Asegura que esté sobre otros elementos */
-    background-color: white; /* O el color que prefieras */
-  }
-  
-  .header-image {
-    width: 100%;
-    height: auto;
-  }
-  
+  width: 100%;
+  height: 70px; /* Altura fija para el header */
+  position: fixed; /* Fijar en la parte superior */
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Asegura que esté sobre otros elementos */
+  background-color: white; /* Color de fondo */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+  overflow: hidden; /* Evita que la imagen se desborde */
+}
+
+.header-image {
+  width: 100%; /* La imagen ocupa el 100% del ancho del header */
+  height: 100%; /* La imagen ocupa el 100% de la altura del header */
+  object-fit: cover; /* Ajusta la imagen para cubrir todo el espacio sin distorsionarse */
+}

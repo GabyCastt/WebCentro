@@ -1,31 +1,36 @@
 /* SIDEBAR */
 .menu {
-    width: 200px;
-    height: 80vh;
-    background-color: #002147;
-    position: fixed;
-    left: 0;
-    top: 70px; /* Espacio para que no solape el header */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 50px;
-  }
-  
-  .menu-button {
-    width: 70%;
-    padding: 30px;
-    margin: 30px 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
-  }
-  
-  .menu-button:hover {
-    background-color: rgba(255, 255, 255, 1);
-    border: 2px solid black;
-  }
-  
+  width: 250px; /* Ancho del sidebar */
+  height: calc(100vh - 70px); /* Altura ajustada al viewport menos el header */
+  background-color: #002147; /* Color de fondo */
+  position: fixed;
+  left: 0;
+  top: 70px; /* Espacio para que no solape el header */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Centra los botones verticalmente */
+  padding: 20px 0; /* Padding solo arriba y abajo */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+  overflow-y: auto; /* Permite scroll si el contenido excede la altura */
+}
+
+.menu-button {
+  width: 80%; /* Ancho de los botones */
+  padding: 10px; /* Padding interno */
+  margin: 10px 0; /* Margen entre botones */
+  background-color: rgba(255, 255, 255, 0.9); /* Fondo semi-transparente */
+  border: none;
+  border-radius: 8px; /* Bordes redondeados */
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  color: #002147; /* Color de texto */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Transición suave */
+}
+
+.menu-button:hover {
+  background-color: rgba(255, 255, 255, 1); /* Fondo completamente blanco al hover */
+  border: 2px solid #002147; /* Borde que combina con el fondo del sidebar */
+  transform: scale(1.05); /* Efecto de escala al hover */
+}

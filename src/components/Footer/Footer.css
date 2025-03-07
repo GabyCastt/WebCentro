@@ -1,16 +1,26 @@
+/* Añade un margen inferior al contenido principal */
+main {
+  margin-bottom: 100px; /* Ajusta según la altura del footer */
+}
+
 /* FOOTER */
 .footer {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: calc(100% - 250px); /* Resta el ancho del sidebar */
-    text-align: right;
-    background-color: white; /* O el color que prefieras */
-    padding: 10px;
-  }
-  
-  .footer-image {
-    width: auto;
-    height: 50px; /* Ajusta según necesites */
-  }
-  
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: calc(100% - 250px); /* Resta el ancho del sidebar */
+  height: 50px; /* Altura del footer */
+  background-color: white; /* Color de fondo */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Alinea el contenido a la derecha */
+  padding: 0 1px; /* Padding lateral para evitar que el contenido toque los bordes */
+  z-index: 1000; /* Asegura que esté sobre otros elementos */
+}
+
+.footer-image {
+  width: 100%; /* La imagen ocupa el 100% del ancho del footer */
+  height: 100%; /* La imagen ocupa el 100% de la altura del footer */
+  object-fit: cover; /* Ajusta la imagen para cubrir todo el espacio sin distorsionarse */
+}
