@@ -1,9 +1,14 @@
 /* Estilos generales */
 #root {
-  max-width: 1280px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
   text-align: right;
+}
+/* Estilos para el contenido principal */
+main {
+  margin-top: 70px; /* Igual a la altura del header */
+  padding: 1px; /* Opcional: para dar un poco de espacio alrededor del contenido */
 }
 
 /* Estilos para el buscador */
@@ -52,7 +57,7 @@ table th {
 }
 
 table tr:hover {
-  background-color: #1869c0;
+  background-color: #cdd5dd;
 }
 
 /* Estilos para los botones debajo de la tabla */
@@ -73,4 +78,25 @@ table tr:hover {
 
 .button-container button:hover {
   background-color: #140E4E;
+}
+.btn.btn-outline-danger{
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #D84040;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  margin-right: 10px;
+}
+.btn.btn-outline-info{
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #17A2B8;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  margin-right: 10px;
+
 }

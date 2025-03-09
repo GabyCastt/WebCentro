@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Sidebar.css';
-import menuBackground from './sidebar_background.jpg';
+import menuBackground from './side2.jpg';
 
 const Menu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <nav className="menu" style={{ backgroundImage: `url(${menuBackground})` }}>
-      <button className="menu-button">HISTORIAL DE REGISTROS</button>
-      <button className="menu-button">NUEVO REGISTRO</button>
-      <button className="menu-button">ENCUESTA</button>
-    </nav>
+    <>
+      {/* Botón de toggle siempre visible */}
+      <button className="menu-toggle" onClick={toggleMenu}>
+        ☰
+      </button>
+
+      {/* Menú que se abre/cierra */}
+      <nav className={`menu ${isOpen ? 'open' : ''}`} style={{ backgroundImage: `url(${menuBackground})` }}>
+        <button className="menu-button">HISTÓRICO EMPRENDEDORES</button>
+        <button className="menu-button">NUEVO REGISTRO EMPRENDEDOR</button>
+        <button className="menu-button">ENCUESTA</button>
+      </nav>
+    </>
   );
 };
 

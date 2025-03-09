@@ -1,36 +1,60 @@
-/* SIDEBAR */
+/* Estilos base para el menú */
 .menu {
-  width: 250px; /* Ancho del sidebar */
-  height: calc(100vh - 70px); /* Altura ajustada al viewport menos el header */
-  background-color: #002147; /* Color de fondo */
-  position: fixed;
-  left: 0;
-  top: 70px; /* Espacio para que no solape el header */
+  width: 200px;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: center; /* Centra los botones verticalmente */
-  padding: 20px 0; /* Padding solo arriba y abajo */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
-  overflow-y: auto; /* Permite scroll si el contenido excede la altura */
+  padding: -10px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: -250px; /* Menú oculto por defecto */
+  transition: left 0.3s ease;
 }
 
+.menu.open {
+  left: 0; /* Menú visible */
+}
+
+/* Estilos para los botones del menú */
 .menu-button {
-  width: 80%; /* Ancho de los botones */
-  padding: 10px; /* Padding interno */
-  margin: 10px 0; /* Margen entre botones */
-  background-color: rgba(255, 255, 255, 0.9); /* Fondo semi-transparente */
+  background-color: rgba(255, 255, 255, 0.8);
   border: none;
-  border-radius: 8px; /* Bordes redondeados */
+  padding: 10px;
+  margin: 10px 0;
   cursor: pointer;
   font-size: 16px;
   text-align: center;
-  color: #002147; /* Color de texto */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Transición suave */
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  width: 80%;
 }
 
 .menu-button:hover {
-  background-color: rgba(255, 255, 255, 1); /* Fondo completamente blanco al hover */
-  border: 2px solid #002147; /* Borde que combina con el fondo del sidebar */
-  transform: scale(1.05); /* Efecto de escala al hover */
+  background-color: rgba(255, 255, 255, 1);
+}
+
+/* Estilos para el botón de toggle (siempre visible) */
+.menu-toggle {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+/* Estilos responsivos (opcional, si quieres ajustar algo en pantallas pequeñas) */
+@media (max-width: 768px) {
+  .menu-toggle {
+    /* Puedes ajustar estilos específicos para móviles si es necesario */
+  }
 }
