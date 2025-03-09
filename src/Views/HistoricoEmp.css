@@ -1,0 +1,102 @@
+/* Estilos generales */
+#root {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: right;
+  }
+  /* Estilos para el contenido principal */
+  main {
+    margin-top: 70px; /* Igual a la altura del header */
+    padding: 1px; /* Opcional: para dar un poco de espacio alrededor del contenido */
+  }
+  
+  /* Estilos para el buscador */
+  .search-container {
+    margin-bottom: 20px;
+  }
+  
+  .search-container input {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  
+  .search-container button {
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #7996b6;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .search-container button:hover {
+    background-color: #1869c0;
+  }
+  
+  /* Estilos para la tabla */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #ECE9FC;
+    font-weight: bold;
+  }
+  
+  table tr:hover {
+    background-color: #cdd5dd;
+  }
+  
+  /* Estilos para los botones debajo de la tabla */
+  .button-container {
+    margin-top: 20px;
+  }
+  
+  .button-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #140E4E;
+    color: white;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .button-container button:hover {
+    background-color: #140E4E;
+  }
+  .btn.btn-outline-danger{
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #D84040;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  .btn.btn-outline-info{
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #17A2B8;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    margin-right: 10px;
+  
+  }
