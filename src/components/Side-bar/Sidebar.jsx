@@ -11,6 +11,10 @@ const Menu = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleInicioClick = () => {
+    navigate('/'); // Redirige a la página principal (App.jsx)
+  };
+
   const handleHistoricoClick = () => {
     navigate('/historico'); // Redirige a la ruta /historico
   };
@@ -24,6 +28,7 @@ const Menu = () => {
 
       {/* Menú que se abre/cierra */}
       <nav className={`menu ${isOpen ? 'open' : ''}`} style={{ backgroundImage: `url(${menuBackground})` }}>
+        <button className="menu-button" onClick={handleInicioClick}>INICIO</button>
         <button className="menu-button" onClick={handleHistoricoClick}>HISTÓRICO EMPRENDEDORES</button>
         <button className="menu-button">NUEVO REGISTRO EMPRENDEDOR</button>
         <button className="menu-button">ENCUESTA</button>

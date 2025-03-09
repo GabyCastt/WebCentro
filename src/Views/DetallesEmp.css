@@ -1,0 +1,54 @@
+.detalles-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .info-box {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+
+  }
+  
+  .details-table td {
+    padding: 10px;
+    border: 1px solid #B7B0B0;
+  }
+  
+  .button-group {
+    margin-top: 2px;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .button-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .edit-btn {
+    background-color: #140E4E;
+    color: white;
+  }
+  
+  .report-btn {
+    background-color: #140E4E;
+    color: white;
+  }
+  
+  .survey-btn {
+    background-color: #140E4E;
+    color: white;
+  }
