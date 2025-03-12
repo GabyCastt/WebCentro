@@ -55,8 +55,7 @@ function App() {
           {/* Ruta para el componente HistoricoEmp */}
           <Route path="/INICIO" element={<App />} />
           <Route path="/historico" element={<HistoricoEmp />} />
-          <Route path="/detalles/:id" element={<DetallesEmp />} />
-        </Routes>
+          <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />        </Routes>
       </div>
     </Router>
   );

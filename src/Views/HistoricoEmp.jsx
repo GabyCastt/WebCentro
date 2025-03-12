@@ -1,26 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './HistoricoEmp.css';
 import Header from '../components/Header/Header';
 import Sidebar from '../components/Side-bar/Sidebar';
 
 function HistoricoEmp() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [emprendedores, setEmprendedores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const emprendedores = [
-    { id: 1, fecha: '04/05/2024', nombre: 'GABRIELA CASTILLO' },
-    { id: 2, fecha: '04/05/2024', nombre: 'JUAN PEREZ' },
-    { id: 3, fecha: '04/05/2024', nombre: 'MARIA RODRIGUEZ' },
-    { id: 4, fecha: '04/05/2024', nombre: 'CARLOS GONZALEZ' },
-  ];
+  useEffect(() => {
+    const fetchEmprendedores = async () => {
+      try {
+        const response = await axios.get('https://localhost:7075/api/Emprendedores');
+        setEmprendedores(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
+    fetchEmprendedores();
+  }, []);
 
   const filteredEmprendedores = emprendedores.filter((emprendedor) =>
     emprendedor.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDetailsClick = (id) => {
-    navigate(`/detalles/${id}`);
+  const handleDetailsClick = (idEmprendedor) => {
+    console.log("ID del emprendedor en HistoricoEmp:", idEmprendedor); // Verifica que el ID no sea undefined
+    navigate(`/detalles/${idEmprendedor}`);
+  };
+
+  const handleDeleteClick = async (idEmprendedor) => {
+    try {
+      await axios.delete(`https://localhost:7075/api/Emprendedores/${idEmprendedor}`);
+      // Actualiza la lista de emprendedores después de eliminar
+      setEmprendedores((prevEmprendedores) =>
+        prevEmprendedores.filter((emprendedor) => emprendedor.idEmprendedor !== idEmprendedor)
+      );
+      alert("Emprendedor eliminado correctamente");
+    } catch (error) {
+      console.error("Error al eliminar el emprendedor:", error.response || error);
+      alert("Error al eliminar el emprendedor");
+    }
   };
 
   const handleButton1Click = () => {
@@ -30,6 +57,14 @@ function HistoricoEmp() {
   const handleButton2Click = () => {
     alert('Añadir nuevo emprendedor');
   };
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="App">
@@ -55,17 +90,20 @@ function HistoricoEmp() {
           </thead>
           <tbody>
             {filteredEmprendedores.map((emprendedor) => (
-              <tr key={emprendedor.id}>
+              <tr key={emprendedor.idEmprendedor}>
                 <td>{emprendedor.fecha}</td>
                 <td>{emprendedor.nombre}</td>
                 <td>
                   <button
                     className="btn btn-outline-info"
-                    onClick={() => handleDetailsClick(emprendedor.id)}
+                    onClick={() => handleDetailsClick(emprendedor.idEmprendedor)}
                   >
                     Detalles
                   </button>
-                  <button className="btn btn-outline-danger">
+                  <button
+                    className="btn btn-outline-danger"
+                    onClick={() => handleDeleteClick(emprendedor.idEmprendedor)}
+                  >
                     Eliminar
                   </button>
                 </td>
@@ -74,7 +112,6 @@ function HistoricoEmp() {
           </tbody>
         </table>
 
-        {/* Botones adicionales debajo de la tabla */}
         <div className="button-container">
           <button onClick={handleButton1Click}>Reporte General</button>
           <button onClick={handleButton2Click}>Añadir Emprendedor</button>
