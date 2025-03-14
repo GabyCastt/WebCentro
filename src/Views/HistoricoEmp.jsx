@@ -9,7 +9,6 @@ function HistoricoEmp() {
   const [searchTerm, setSearchTerm] = useState('');
   const [emprendedores, setEmprendedores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,9 +16,10 @@ function HistoricoEmp() {
       try {
         const response = await axios.get('https://localhost:7075/api/Emprendedores');
         setEmprendedores(response.data);
-        setLoading(false);
       } catch (error) {
-        setError(error);
+        console.warn("No se pudo obtener los datos del backend.");
+        setEmprendedores([]); // Evita errores si el backend no está disponible
+      } finally {
         setLoading(false);
       }
     };
@@ -32,14 +32,13 @@ function HistoricoEmp() {
   );
 
   const handleDetailsClick = (idEmprendedor) => {
-    console.log("ID del emprendedor en HistoricoEmp:", idEmprendedor); // Verifica que el ID no sea undefined
+    console.log("ID del emprendedor en HistoricoEmp:", idEmprendedor);
     navigate(`/detalles/${idEmprendedor}`);
   };
 
   const handleDeleteClick = async (idEmprendedor) => {
     try {
       await axios.delete(`https://localhost:7075/api/Emprendedores/${idEmprendedor}`);
-      // Actualiza la lista de emprendedores después de eliminar
       setEmprendedores((prevEmprendedores) =>
         prevEmprendedores.filter((emprendedor) => emprendedor.idEmprendedor !== idEmprendedor)
       );
@@ -58,21 +57,12 @@ function HistoricoEmp() {
     alert('Añadir nuevo emprendedor');
   };
 
-  if (loading) {
-    return <div>Cargando...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
   return (
     <div className="App">
       <Header />
       <Sidebar />
       <main>
         <h1>HISTÓRICO EMPRENDEDORES</h1>
-
         <input
           type="text"
           placeholder="Buscar por nombre..."
@@ -89,26 +79,34 @@ function HistoricoEmp() {
             </tr>
           </thead>
           <tbody>
-            {filteredEmprendedores.map((emprendedor) => (
-              <tr key={emprendedor.idEmprendedor}>
-                <td>{emprendedor.fecha}</td>
-                <td>{emprendedor.nombre}</td>
-                <td>
-                  <button
-                    className="btn btn-outline-info"
-                    onClick={() => handleDetailsClick(emprendedor.idEmprendedor)}
-                  >
-                    Detalles
-                  </button>
-                  <button
-                    className="btn btn-outline-danger"
-                    onClick={() => handleDeleteClick(emprendedor.idEmprendedor)}
-                  >
-                    Eliminar
-                  </button>
+            {filteredEmprendedores.length > 0 ? (
+              filteredEmprendedores.map((emprendedor) => (
+                <tr key={emprendedor.idEmprendedor}>
+                  <td>{emprendedor.fecha}</td>
+                  <td>{emprendedor.nombre}</td>
+                  <td>
+                    <button
+                      className="btn btn-outline-info"
+                      onClick={() => handleDetailsClick(emprendedor.idEmprendedor)}
+                    >
+                      Detalles
+                    </button>
+                    <button
+                      className="btn btn-outline-danger"
+                      onClick={() => handleDeleteClick(emprendedor.idEmprendedor)}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" style={{ textAlign: "center", padding: "10px" }}>
+                  No hay datos disponibles.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
