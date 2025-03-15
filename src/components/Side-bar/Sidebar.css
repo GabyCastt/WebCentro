@@ -55,6 +55,7 @@
 /* Estilos responsivos (opcional, si quieres ajustar algo en pantallas pequeñas) */
 @media (max-width: 768px) {
   .menu-toggle {
-    /* Puedes ajustar estilos específicos para móviles si es necesario */
+    font-size: 20px; /* Ajuste de tamaño en pantallas pequeñas */
+    padding: 8px;
   }
 }

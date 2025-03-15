@@ -18,7 +18,10 @@ const Menu = () => {
   const handleHistoricoClick = () => {
     navigate('/historico'); // Redirige a la ruta /historico
   };
-
+  const handleRegistroClick = () => {
+    navigate('/registroemp'); // Redirige a la ruta /registroemp
+  };
+  
   return (
     <>
       {/* Botón de toggle siempre visible */}
@@ -30,7 +33,7 @@ const Menu = () => {
       <nav className={`menu ${isOpen ? 'open' : ''}`} style={{ backgroundImage: `url(${menuBackground})` }}>
         <button className="menu-button" onClick={handleInicioClick}>INICIO</button>
         <button className="menu-button" onClick={handleHistoricoClick}>HISTÓRICO EMPRENDEDORES</button>
-        <button className="menu-button">NUEVO REGISTRO EMPRENDEDOR</button>
+        <button className="menu-button"onClick={handleRegistroClick}>NUEVO REGISTRO EMPRENDEDOR</button>
         <button className="menu-button">ENCUESTA</button>
       </nav>
     </>
