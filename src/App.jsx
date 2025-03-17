@@ -5,7 +5,7 @@ import Header from "./components/Header/Header";
 import Menu from "./components/Side-bar/Sidebar";
 import HistoricoEmp from "./Views/HistoricoEmp"; // Importa el componente HistoricoEmp
 import DetallesEmp from './Views/DetallesEmp';
-
+import RegistroEmp from "./Views/RegistroEmp";
 
 function App() {
   return (
@@ -55,7 +55,9 @@ function App() {
           {/* Ruta para el componente HistoricoEmp */}
           <Route path="/INICIO" element={<App />} />
           <Route path="/historico" element={<HistoricoEmp />} />
-          <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />        </Routes>
+          <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />  
+          <Route path="/registroemp" element={<RegistroEmp />} />      
+          </Routes>
       </div>
     </Router>
   );
