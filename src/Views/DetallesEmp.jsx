@@ -29,10 +29,6 @@ function DetallesEmp() {
     celular: "",
     correo: "",
     cedula: "",
-    nombreProyecto: "",
-    descripcionProyecto: "",
-    sector: "",
-    fechaRegistro: "",
     datosEmps: [], // Campo anidado
   });
 
