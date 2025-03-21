@@ -29,7 +29,7 @@ function DetallesEmp() {
     celular: "",
     correo: "",
     cedula: "",
-    datosEmps: [], // Campo anidado
+    datosEmps: [], 
   });
 
   // Rangos de edad para el emprendedor y empleados
@@ -52,8 +52,8 @@ function DetallesEmp() {
           `https://localhost:7075/api/Emprendedores/${idEmprendedor}`
         );
         setEmprendedor(response.data);
-        setEditedEmprendedor(response.data); // Inicializa los datos editables
-        console.log("Datos obtenidos de la API:", response.data); // Verifica los datos obtenidos
+        setEditedEmprendedor(response.data); 
+        console.log("Datos obtenidos de la API:", response.data); 
       } catch (error) {
         console.error("Error al obtener los datos:", error.response || error);
         setError(error);
@@ -71,14 +71,14 @@ function DetallesEmp() {
 
   const handleSaveClick = async () => {
     try {
-      console.log("Datos enviados a la API:", editedEmprendedor); // Verifica los datos enviados
+      console.log("Datos enviados a la API:", editedEmprendedor); 
       const response = await axios.put(
         `https://localhost:7075/api/Emprendedores/${idEmprendedor}`,
         editedEmprendedor
       );
-      console.log("Datos actualizados:", response.data); // Verifica la respuesta
-      setEmprendedor(response.data || editedEmprendedor); // Actualiza con la respuesta o con editedEmprendedor
-      setIsEditing(false); // Desactiva el modo de edición
+      console.log("Datos actualizados:", response.data); 
+      setEmprendedor(response.data || editedEmprendedor);
+      setIsEditing(false); 
     } catch (error) {
       console.error("Error al actualizar los datos:", error.response || error);
     }
@@ -107,6 +107,10 @@ function DetallesEmp() {
   if (!emprendedor) {
     return <div>No se encontraron datos del emprendedor.</div>;
   }
+
+  const handleButton2Click = () => {
+    navigate(`/detalles/${idEmprendedor}/encuesta`); // Redirige a la encuesta con el idEmprendedor
+  };
 
   return (
     <div className="App">
@@ -417,8 +421,7 @@ function DetallesEmp() {
             {isEditing ? "Guardar" : "EDITAR"}
           </button>
           <button className="report-btn">Generar Reporte</button>
-          <button className="survey-btn">Agregar Resultado Encuesta</button>
-
+          <button onClick={handleButton2Click}>Agregar Resultado Encuesta</button>
           <button className="back-btn" onClick={() => navigate(-1)}> Regresar </button>
         </div>
       </main>

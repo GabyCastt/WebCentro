@@ -1,65 +1,51 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Importa react-router-dom
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header/Header";
 import Menu from "./components/Side-bar/Sidebar";
-import HistoricoEmp from "./Views/HistoricoEmp"; // Importa el componente HistoricoEmp
-import DetallesEmp from './Views/DetallesEmp';
+import HistoricoEmp from "./Views/HistoricoEmp";
+import DetallesEmp from "./Views/DetallesEmp";
 import RegistroEmp from "./Views/RegistroEmp";
+import Login from "./Views/Login";
+import PrivateRoute from "./components/PrivateRoute.jsx"; 
+import { AuthProvider } from "./context/AuthContext"; 
+import Encuesta from "./Views/Encuesta.jsx";
+import RegistrarRol from "./Views/RegistrarRol";
+
 
 function App() {
+  const [user, setUser] = useState(null); 
+
   return (
-    <Router>
-<div class="loader">
-  <div class="container">
-    <div class="carousel">
-      <div class="love"></div>
-      <div class="love"></div>
-      <div class="love"></div>
-      <div class="love"></div>
-      <div class="love"></div>
-      <div class="love"></div>
-      <div class="love"></div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="carousel">
-      <div class="death"></div>
-      <div class="death"></div>
-      <div class="death"></div>
-      <div class="death"></div>
-      <div class="death"></div>
-      <div class="death"></div>
-      <div class="death"></div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="carousel">
-      <div class="robots"></div>
-      <div class="robots"></div>
-      <div class="robots"></div>
-      <div class="robots"></div>
-      <div class="robots"></div>
-      <div class="robots"></div>
-      <div class="robots"></div>
-    </div>
-  </div>
-</div>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Header />
+          {!user && (
+            <div className="login-button-container">
+              <Link to="/login">
+                <button>Login</button>
+              </Link>
+            </div>
+          )}
 
-      <div className="App">
-        <Header />
-        <Routes>
-          {/* Ruta principal */}
-          <Route path="/" element={<Menu />} />
+          <Routes>
+            <Route path="/login" element={<Login setUser={setUser} />} />
+            <Route path="/RegistrarRol" element={<RegistrarRol setUser={setUser} />} />
 
-          {/* Ruta para el componente HistoricoEmp */}
-          <Route path="/INICIO" element={<App />} />
-          <Route path="/historico" element={<HistoricoEmp />} />
-          <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />  
-          <Route path="/registroemp" element={<RegistroEmp />} />      
+            <Route path="/" element={<PrivateRoute user={user} />}>
+              <Route path="/" element={<Menu />} />
+              <Route path="/INICIO" element={<App />} />
+              <Route path="/historico" element={<HistoricoEmp />} />
+              <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
+              <Route path="/detalles/:idEmprendedor/encuesta" element={<Encuesta />}/>
+              <Route path="/encuesta" element={<Encuesta />} />
+              <Route path="/registroemp" element={<RegistroEmp />} />
+            </Route>
           </Routes>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

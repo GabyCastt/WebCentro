@@ -7,8 +7,8 @@
   }
   /* Estilos para el contenido principal */
   main {
-    margin-top: 70px; /* Igual a la altura del header */
-    padding: 1px; /* Opcional: para dar un poco de espacio alrededor del contenido */
+    margin-top: 70px; 
+    padding: 1px; 
   }
   
   /* Estilos para el buscador */

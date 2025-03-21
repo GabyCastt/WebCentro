@@ -1,0 +1,103 @@
+/* Contenedor principal del formulario */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f2f2f2;
+  padding: 30px;
+  background-image: url('https://www.uniandes.edu.co/sites/default/files/u599/campus-universitario.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Título principal */
+h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #9e1b32; 
+  text-align: center;
+}
+
+/* Estilo del formulario */
+form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Contenedor de cada campo */
+form div {
+  margin-bottom: 15px;
+}
+
+/* Estilo de las etiquetas */
+label {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+/* Estilo de los campos de entrada */
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+/* Estilo del campo cuando está en foco */
+input:focus {
+  outline: none;
+  border-color: #9e1b32; 
+}
+
+/* Estilo del botón de login */
+button {
+  padding: 15px;
+  font-size: 1rem;
+  background-color: #140E4E; 
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #4021ee; 
+}
+
+/* Estilo de los mensajes de error */
+.error {
+  color: #e74c3c;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Estilo del botón de registro */
+.register-btn {
+  margin-top: 15px;
+  background-color: #3215d8;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.register-btn:hover {
+  background-color: #031164;
+}

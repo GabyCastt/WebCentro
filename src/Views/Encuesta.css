@@ -1,0 +1,113 @@
+.survey-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+/* Caja que contiene la encuesta */
+.survey-box {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+.survey-type{
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #6f1d1b;
+}
+.category-label{
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #0c0101;
+}
+.dimensionesMap{
+  display: flex;
+  justify-content: center;
+  gap: 25px; 
+  margin-bottom: 30px;
+}
+
+/* Texto de la pregunta */
+.question-text {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  color: #333;
+}
+
+/* Contenedor de las respuestas */
+.answers-container {
+  display: flex;
+  justify-content: center;
+  gap: 25px; 
+  margin-bottom: 30px;
+}
+
+/* Estilo de cada respuesta (círculo) */
+.answer-circle {
+  position: relative;
+  width: 70px; 
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #bb9457;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.answer-circle:hover {
+  background-color: #edf2f7;
+  border-color: #432818; 
+}
+
+/* Etiqueta de cada respuesta */
+.answer-label {
+  position: absolute;
+  top: -25px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #4a5568;
+}
+
+/* Respuesta seleccionada */
+.answer-circle.selected {
+  background-color: #540b0e;
+  border-color: #9e2a2b;
+  color: white;
+}
+
+/* Botón siguiente */
+.next-button {
+  background-color: #140E4E;
+  color: white;
+  padding: 12px 25px; 
+  border-radius: 5px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s; 
+}
+
+.next-button:hover {
+  background-color: #2b6cb0;
+  transform: scale(1.05);
+}
+
+/* Número de la pregunta */
+.question-number {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #4a5568;
+}
