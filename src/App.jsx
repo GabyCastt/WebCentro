@@ -11,6 +11,7 @@ import PrivateRoute from "./components/PrivateRoute.jsx";
 import { AuthProvider } from "./context/AuthContext"; 
 import Encuesta from "./Views/Encuesta.jsx";
 import RegistrarRol from "./Views/RegistrarRol";
+import Resultados from "./Views/Resultados";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
               <Route path="/detalles/:idEmprendedor/encuesta" element={<Encuesta />}/>
               <Route path="/encuesta" element={<Encuesta />} />
+              <Route path="/resultados" element={<Resultados />} />
               <Route path="/registroemp" element={<RegistroEmp />} />
             </Route>
           </Routes>

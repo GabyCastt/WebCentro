@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import "./Encuesta.css";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
@@ -27,6 +28,7 @@ const Survey = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [surveyType, setSurveyType] = useState("ICE");
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const navigate = useNavigate(); // Inicializa useNavigate
 
   useEffect(() => {
     fetchQuestions();
@@ -66,6 +68,7 @@ const Survey = () => {
         setSurveyType("IEPM");
       } else {
         alert("Encuesta finalizada");
+        navigate("/resultados"); // Redirige a la vista de Resultados
       }
     }
   };
@@ -120,7 +123,7 @@ const Survey = () => {
           </div>
 
           <button onClick={handleNext} className="next-button">
-            Siguiente
+            {currentIndex < questions.length - 1 ? "Siguiente" : "Finalizar"}
           </button>
         </div>
       </div>
@@ -129,4 +132,3 @@ const Survey = () => {
 };
 
 export default Survey;
-
