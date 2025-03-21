@@ -9,7 +9,7 @@ function HistoricoEmp() {
   const [searchTerm, setSearchTerm] = useState('');
   const [emprendedores, setEmprendedores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchEmprendedores = async () => {
@@ -18,7 +18,7 @@ function HistoricoEmp() {
         setEmprendedores(response.data);
       } catch (error) {
         console.warn("No se pudo obtener los datos del backend.");
-        setEmprendedores([]); // Evita errores si el backend no está disponible
+        setEmprendedores([]); 
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ function HistoricoEmp() {
   };
 
   const handleButton2Click = () => {
-    alert('Añadir nuevo emprendedor');
+    navigate("/registroemp"); 
   };
 
   return (
