@@ -31,6 +31,12 @@ const Login = ({ setUser }) => {
 
       if (user) {
         setUser(user);
+
+        //Guarda el usario en localStorage
+
+        localStorage.setItem('usuario', JSON.stringify(user));
+
+
         navigate("/"); 
       } else {
         setErrorMessage("Credenciales incorrectas");

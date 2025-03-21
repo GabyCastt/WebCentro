@@ -5,6 +5,7 @@ const PrivateRoute = ({ user }) => {
   const navigate = useNavigate();
 
   // Si no hay un usuario autenticado, redirige al login
+  
   if (!user) {
     navigate("/login");
     return null;

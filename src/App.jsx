@@ -41,6 +41,7 @@ function App() {
               <Route path="/detalles/:idEmprendedor/encuesta" element={<Encuesta />}/>
               <Route path="/encuesta" element={<Encuesta />} />
               <Route path="/registroemp" element={<RegistroEmp />} />
+              <Route path="/emprendedor/:idEmprendedor" element={<DetallesEmp />} />
             </Route>
           </Routes>
         </div>
