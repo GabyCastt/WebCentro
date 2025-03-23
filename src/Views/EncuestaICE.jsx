@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./EncuestaICE.css";
 
 const competenciasMap = {
@@ -14,11 +15,12 @@ const competenciasMap = {
   10: "Orientación tecnológica e innovación",
 };
 
-const IceSurvey = ({ onComplete }) => {
+const EncuestaICE = () => {
   const [questions, setQuestions] = useState([]);
   const [currentCompetenciaIndex, setCurrentCompetenciaIndex] = useState(0);
   const [groupedQuestions, setGroupedQuestions] = useState({});
   const [answers, setAnswers] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchQuestions();
@@ -52,17 +54,20 @@ const IceSurvey = ({ onComplete }) => {
   const handleNextCompetencia = () => {
     if (currentCompetenciaIndex < competenciasIds.length - 1) {
       setCurrentCompetenciaIndex(currentCompetenciaIndex + 1);
-    } else {
-      console.log("Respuestas enviadas:", answers);
-      onComplete();
     }
+  };
+
+  const handleFinalizarEncuesta = () => {
+    console.log("Respuestas enviadas:", answers);
+    navigate("/ventanaencuestas");
   };
 
   const currentCompetenciaId = competenciasIds[currentCompetenciaIndex];
   const currentQuestions = groupedQuestions[currentCompetenciaId] || [];
+  const isLastCompetencia = currentCompetenciaIndex === competenciasIds.length - 1;
 
   return (
-    <div className="ice-survey-box">
+    <div className="ice-container">
       <p className="ice-survey-type">
         Tipo de encuesta: <strong>ICE</strong>
       </p>
@@ -90,13 +95,19 @@ const IceSurvey = ({ onComplete }) => {
         </div>
       ))}
 
-      <button onClick={handleNextCompetencia} className="ice-next-button">
-        {currentCompetenciaIndex < competenciasIds.length - 1
-          ? "Siguiente Competencia"
-          : "Finalizar Encuesta"}
-      </button>
+      {!isLastCompetencia && (
+        <button onClick={handleNextCompetencia} className="ice-next-button">
+          Siguiente Competencia
+        </button>
+      )}
+
+      {isLastCompetencia && (
+        <button onClick={handleFinalizarEncuesta} className="ice-finalizar-button">
+          Finalizar Encuesta
+        </button>
+      )}
     </div>
   );
 };
 
-export default IceSurvey;
+export default EncuestaICE;

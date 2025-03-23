@@ -1,83 +1,79 @@
-/* VentanaEncuestas.css */
-
 /* Contenedor principal */
-.survey-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f8f9fa;
-    font-family: 'Arial', sans-serif;
-  }
-  
-  /* Layout con la barra lateral y contenido */
-  .survey-layout {
-    display: flex;
-    flex: 1;
-  }
-  
-  /* Estilo general del contenido */
-  .survey-selection, .survey-content {
-    flex: 1;
-    padding: 40px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    margin: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Títulos */
-  .survey-selection h2, .survey-content h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .survey-option h3 {
-    font-size: 22px;
-    margin-bottom: 10px;
-    color: #0056b3;
-  }
-  
-  /* Descripción de cada encuesta */
-  .survey-option p {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: #555;
-  }
-  
-  /* Botones */
-  button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Ajuste de la barra lateral si la tienes */
-  .sidebar {
-    width: 250px;
-    background-color: #343a40;
-    color: #fff;
-    padding: 20px;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .survey-layout {
-      flex-direction: column;
-    }
-  
-    .sidebar {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-  }
-  
+.ven-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
+  font-family: "Arial", sans-serif;
+}
+
+/* Layout principal */
+.ven-layout {
+  display: flex;
+  flex: 1;
+}
+
+/* Sección de selección de encuestas */
+.ven-selection {
+  flex: 1;
+  padding: 20px;
+  background-color: #ffffff;
+  margin: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de la sección */
+.ven-title {
+  font-size: 24px;
+  color: #9e1b32;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Opción de encuesta */
+.ven-option {
+  background-color: #f9f9f9;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ven-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título de la opción */
+.ven-option-title {
+  font-size: 20px;
+  color: #444444;
+  margin-bottom: 10px;
+}
+
+/* Descripción de la opción */
+.ven-option-description {
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+/* Botón de la opción */
+.ven-option-button {
+  background-color: #140E4E;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.ven-option-button:hover {
+  background-color: #0056b3;
+}

@@ -1,75 +1,128 @@
-.ice-survey-box {
-    max-width: 800px;
-    margin: auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .ice-survey-type, .ice-category-label, .ice-question-text {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #333;
-  }
-  
-  .ice-category-label {
-    font-weight: bold;
-    color: #1e88e5;
-  }
-  
-  .ice-question-block {
-    margin-bottom: 40px;
-  }
-  
-  .ice-answers-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 15px;
-  }
-  
-  .ice-answer-circle {
-    width: 60px;
-    height: 60px;
-    background-color: #f1f1f1;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-    color: #333;
-    border: 2px solid #ccc;
-  }
-  
-  .ice-answer-circle:hover {
-    background-color: #e0e0e0;
-    transform: scale(1.1);
-  }
-  
-  .ice-answer-circle.ice-selected {
-    background-color: #4caf50;
-    color: #fff;
-    border-color: #4caf50;
-    transform: scale(1.15);
-  }
-  
-  .ice-next-button {
-    display: block;
-    margin: 30px auto 0;
-    padding: 15px 40px;
-    background-color: #1e88e5;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .ice-next-button:hover {
-    background-color: #1565c0;
-  }
-  
+/* Contenedor principal */
+.ice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  font-family: "Arial", sans-serif;
+}
+
+/* Tipo de encuesta */
+.ice-survey-type {
+  font-size: 18px;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold; /* Texto en negrita */
+}
+
+/* Etiqueta de competencia */
+.ice-category-label {
+  font-size: 16px;
+  color: #9e1b32; /* Color rojo */
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: bold; /* Texto en negrita */
+}
+
+/* Bloque de pregunta */
+.ice-question-block {
+  margin-bottom: 25px;
+  padding: 15px;
+  background-color: #f9f9f9; /* Fondo resaltado */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para efecto flotante */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ice-question-block:hover {
+  transform: translateY(-5px); /* Efecto flotante al pasar el mouse */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Texto de la pregunta */
+.ice-question-text {
+  font-size: 14px;
+  color: #444444;
+  margin-bottom: 15px;
+  text-align: left; /* Alineación a la izquierda */
+}
+
+/* Contenedor de respuestas */
+.ice-answers-container {
+  display: flex;
+  justify-content: center; /* Centra los círculos */
+  gap: 5px; /* Reduce el espacio entre los círculos */
+}
+
+/* Círculo de respuesta */
+.ice-answer-circle {
+  width: 50px; /* Círculos más grandes */
+  height: 50px; /* Círculos más grandes */
+  border: 2px solid #034C53;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+}
+
+/* Efecto al pasar el mouse */
+.ice-answer-circle:hover {
+  background-color: #e6f2ff; /* Color más suave al pasar el mouse */
+  border-color: #3D8D7A;
+  transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+}
+
+/* Círculo seleccionado */
+.ice-answer-circle.ice-selected {
+  background-color: #034C53;
+  border-color: #6A9C89;
+  color: #ffffff;
+}
+
+/* Etiqueta dentro del círculo */
+.ice-answer-label {
+  font-size: 16px; /* Texto un poco más grande */
+  color: inherit;
+  font-weight: bold; /* Texto en negrita */
+}
+
+/* Botón Siguiente Competencia */
+.ice-next-button {
+  background-color: #140E4E;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: block;
+  margin: 20px auto 0;
+}
+
+.ice-next-button:hover {
+  background-color: #0056b3;
+}
+
+/* Botón Finalizar Encuesta */
+.ice-finalizar-button {
+  background-color: #28a745;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: block;
+  margin: 20px auto 0;
+}
+
+.ice-finalizar-button:hover {
+  background-color: #218838;
+}
