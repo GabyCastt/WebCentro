@@ -109,7 +109,7 @@ function DetallesEmp() {
   }
 
   const handleButton2Click = () => {
-    navigate(`/detalles/${idEmprendedor}/encuesta`); // Redirige a la encuesta con el idEmprendedor
+    navigate(`/detalles/${idEmprendedor}/ventanaencuestas`); // Redirige a la encuesta con el idEmprendedor
   };
 
   return (
@@ -421,7 +421,7 @@ function DetallesEmp() {
             {isEditing ? "Guardar" : "EDITAR"}
           </button>
           <button className="report-btn">Generar Reporte</button>
-          <button onClick={handleButton2Click}>Agregar Resultado Encuesta</button>
+          <button onClick={handleButton2Click}>Encuestas</button>
           <button className="back-btn" onClick={() => navigate(-1)}> Regresar </button>
         </div>
       </main>

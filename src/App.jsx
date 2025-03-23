@@ -9,7 +9,9 @@ import RegistroEmp from "./Views/RegistroEmp";
 import Login from "./Views/Login";
 import PrivateRoute from "./components/PrivateRoute.jsx"; 
 import { AuthProvider } from "./context/AuthContext"; 
-import Encuesta from "./Views/Encuesta.jsx";
+import EncuestaICE from "./Views/EncuestaICE.jsx";
+import EncuestaIEPM from "./Views/EncuestaIEPM.jsx";
+import VentanaEncuestas from "./Views/VentanaEncuestas.jsx";
 import RegistrarRol from "./Views/RegistrarRol";
 import Resultados from "./Views/Resultados";
 
@@ -39,8 +41,10 @@ function App() {
               <Route path="/INICIO" element={<App />} />
               <Route path="/historico" element={<HistoricoEmp />} />
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
-              <Route path="/detalles/:idEmprendedor/encuesta" element={<Encuesta />}/>
-              <Route path="/encuesta" element={<Encuesta />} />
+              <Route path="/detalles/:idEmprendedor/ventanaencuestas" element={<VentanaEncuestas />} />
+              <Route path="/ventanaencuestas" element={<VentanaEncuestas />} />
+              <Route path="/encuestaice" element={<EncuestaICE />} />
+              <Route path="/encuestaiepm" element={<EncuestaIEPM />} />
               <Route path="/resultados" element={<Resultados />} />
               <Route path="/registroemp" element={<RegistroEmp />} />
               <Route path="/emprendedor/:idEmprendedor" element={<DetallesEmp />} />

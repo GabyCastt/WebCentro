@@ -1,0 +1,83 @@
+/* VentanaEncuestas.css */
+
+/* Contenedor principal */
+.survey-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Layout con la barra lateral y contenido */
+  .survey-layout {
+    display: flex;
+    flex: 1;
+  }
+  
+  /* Estilo general del contenido */
+  .survey-selection, .survey-content {
+    flex: 1;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Títulos */
+  .survey-selection h2, .survey-content h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .survey-option h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #0056b3;
+  }
+  
+  /* Descripción de cada encuesta */
+  .survey-option p {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #555;
+  }
+  
+  /* Botones */
+  button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Ajuste de la barra lateral si la tienes */
+  .sidebar {
+    width: 250px;
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .survey-layout {
+      flex-direction: column;
+    }
+  
+    .sidebar {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  }
+  
