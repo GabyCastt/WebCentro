@@ -1,66 +1,80 @@
-/* Contenedor principal */
+/* Contenedor principal del ICE */
 .ice-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
   background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra pronunciada */
   font-family: "Arial", sans-serif;
 }
 
-/* Tipo de encuesta */
+/* Tipo de encuesta - texto principal */
 .ice-survey-type {
   font-size: 18px;
   color: #333333;
   text-align: center;
   margin-bottom: 20px;
-  font-weight: bold; /* Texto en negrita */
+  font-weight: bold;
 }
 
-/* Etiqueta de competencia */
+/* Etiqueta de competencia - texto secundario */
 .ice-category-label {
   font-size: 16px;
   color: #9e1b32; /* Color rojo */
-  text-align: center;
+  text-align: left;
   margin-bottom: 30px;
-  font-weight: bold; /* Texto en negrita */
+  font-weight: bold;
 }
 
-/* Bloque de pregunta */
+.ice-instructions {
+  font-size: 15px;
+  color: #000000;
+  text-align: left;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.ice-instructions-scale {
+  font-size: 18px;
+  color: #000000; /* Color rojo */
+  text-align: left;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+/* Bloque de preguntas - cada pregunta */
 .ice-question-block {
   margin-bottom: 25px;
   padding: 15px;
-  background-color: #f9f9f9; /* Fondo resaltado */
+  background-color: #f9f9f9;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para efecto flotante */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .ice-question-block:hover {
-  transform: translateY(-5px); /* Efecto flotante al pasar el mouse */
+  transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Texto de la pregunta */
 .ice-question-text {
-  font-size: 14px;
+  font-size: 16px;
   color: #444444;
   margin-bottom: 15px;
-  text-align: left; /* Alineación a la izquierda */
+  text-align: left;
 }
 
-/* Contenedor de respuestas */
 .ice-answers-container {
   display: flex;
-  justify-content: center; /* Centra los círculos */
-  gap: 5px; /* Reduce el espacio entre los círculos */
+  justify-content: center;
+  gap: 40px;
 }
 
-/* Círculo de respuesta */
 .ice-answer-circle {
-  width: 50px; /* Círculos más grandes */
-  height: 50px; /* Círculos más grandes */
+  width: 50px;
+  height: 50px;
   border: 2px solid #034C53;
   border-radius: 50%;
   display: flex;
@@ -68,30 +82,33 @@
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+  flex-direction: column;
+  position: relative;
 }
 
-/* Efecto al pasar el mouse */
+/* Efecto de hover - al pasar el mouse */
 .ice-answer-circle:hover {
-  background-color: #e6f2ff; /* Color más suave al pasar el mouse */
+  background-color: #e6f2ff;
   border-color: #3D8D7A;
-  transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+  transform: scale(1.1);
 }
 
-/* Círculo seleccionado */
+/* Círculo seleccionado - cuando el usuario ha seleccionado una opción */
 .ice-answer-circle.ice-selected {
   background-color: #034C53;
   border-color: #6A9C89;
   color: #ffffff;
 }
 
-/* Etiqueta dentro del círculo */
+/* Etiqueta dentro del círculo - número de respuesta */
 .ice-answer-label {
-  font-size: 16px; /* Texto un poco más grande */
+  font-size: 16px;
   color: inherit;
-  font-weight: bold; /* Texto en negrita */
+  font-weight: bold;
+  margin-top: 5px; /* Esto asegura que el texto esté debajo del número */
 }
 
-/* Botón Siguiente Competencia */
+/* Botón de "Siguiente Competencia" */
 .ice-next-button {
   background-color: #140E4E;
   color: #ffffff;
@@ -109,7 +126,7 @@
   background-color: #0056b3;
 }
 
-/* Botón Finalizar Encuesta */
+/* Botón de "Finalizar Encuesta" */
 .ice-finalizar-button {
   background-color: #28a745;
   color: #ffffff;
@@ -125,4 +142,21 @@
 
 .ice-finalizar-button:hover {
   background-color: #218838;
+}
+/* Contenedor de cada respuesta (círculo + etiqueta) */
+.ice-answer-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px; /* Espacio entre el círculo y la etiqueta */
+}
+
+/* Etiqueta de la escala */
+.ice-scale-label {
+  font-size: 14px;
+  color: #034C53;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 1px;
+  display: block;
 }

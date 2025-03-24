@@ -1,17 +1,23 @@
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
-import "./VentanaEncuestas.css";
+import "./VentanaEncuestas.css"; 
 
 const VentanaEncuestas = () => {
   const navigate = useNavigate();
+  const { idEmprendedor } = useParams(); 
 
   const goToIceSurvey = () => {
-    navigate("/encuestaice");
+    navigate(`/detalles/${idEmprendedor}/encuestaice`);
   };
 
   const goToIepmSurvey = () => {
-    navigate("/encuestaiepm");
+    navigate(`/detalles/${idEmprendedor}/encuestaiepm`); 
+  };
+
+  const goToResults = () => {
+    navigate(`/detalles/${idEmprendedor}/resultados`); 
   };
 
   return (
@@ -39,6 +45,17 @@ const VentanaEncuestas = () => {
             </p>
             <button onClick={goToIepmSurvey} className="ven-option-button">
               Ir a Encuesta IEPM
+            </button>
+          </div>
+
+          {/* Botón para ir a la ventana de resultados */}
+          <div className="ven-option">
+            <h3 className="ven-option-title">Resultados</h3>
+            <p className="ven-option-description">
+              Revisa los resultados de las encuestas ICE e IEPM para este emprendedor.
+            </p>
+            <button onClick={goToResults} className="ven-option-button">
+              Ver Resultados
             </button>
           </div>
         </div>

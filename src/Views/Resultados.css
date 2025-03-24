@@ -66,6 +66,7 @@ h3 {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-bottom: 20px;
+    text-align: right;
 }
 
 .ice-dimensions p {
@@ -233,7 +234,12 @@ h3 {
 }
 
 
-
+@media print {
+    .bar-chart, .bar-chart-3d {
+      display: block !important;
+    }
+  }
+  
 
 /* Estilos responsivos */
 @media (max-width: 768px) {

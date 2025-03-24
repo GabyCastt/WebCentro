@@ -7,17 +7,16 @@ import HistoricoEmp from "./Views/HistoricoEmp";
 import DetallesEmp from "./Views/DetallesEmp";
 import RegistroEmp from "./Views/RegistroEmp";
 import Login from "./Views/Login";
-import PrivateRoute from "./components/PrivateRoute.jsx"; 
-import { AuthProvider } from "./context/AuthContext"; 
+import PrivateRoute from "./components/PrivateRoute.jsx";
+import { AuthProvider } from "./context/AuthContext";
 import EncuestaICE from "./Views/EncuestaICE.jsx";
 import EncuestaIEPM from "./Views/EncuestaIEPM.jsx";
 import VentanaEncuestas from "./Views/VentanaEncuestas.jsx";
 import RegistrarRol from "./Views/RegistrarRol";
 import Resultados from "./Views/Resultados";
 
-
 function App() {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
 
   return (
     <AuthProvider>
@@ -38,17 +37,18 @@ function App() {
 
             <Route path="/" element={<PrivateRoute user={user} />}>
               <Route path="/" element={<Menu />} />
-              <Route path="/INICIO" element={<App />} />
+              <Route path="/INICIO" element={<Menu />} /> {/* Cambia <App /> por <Menu /> */}
               <Route path="/historico" element={<HistoricoEmp />} />
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
               <Route path="/detalles/:idEmprendedor/ventanaencuestas" element={<VentanaEncuestas />} />
-              <Route path="/ventanaencuestas" element={<VentanaEncuestas />} />
+              <Route path="/detalles/:idEmprendedor/encuestaice" element={<EncuestaICE />}/>
+              <Route path="/detalles/:idEmprendedor/resultados" element={<Resultados />}/>
               <Route path="/encuestaice" element={<EncuestaICE />} />
               <Route path="/encuestaiepm" element={<EncuestaIEPM />} />
               <Route path="/resultados" element={<Resultados />} />
               <Route path="/registroemp" element={<RegistroEmp />} />
               <Route path="/emprendedor/:idEmprendedor" element={<DetallesEmp />} />
-            </Route>
+              <Route path="/ventanaencuestas" element={<VentanaEncuestas />} /> </Route>
           </Routes>
         </div>
       </Router>
