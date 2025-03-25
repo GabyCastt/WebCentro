@@ -77,3 +77,27 @@
 .ven-option-button:hover {
   background-color: #0056b3;
 }
+/* Estilos para el botón de regreso */
+.ven-back-button {
+  display: flex;
+  align-items: center;
+  background-color: #3D0301;
+  color: #ffffff;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.ven-back-button:hover {
+  background-color: #B03052;
+  transform: translateX(-3px);
+}
+
+.ven-back-icon {
+  margin-right: 8px;
+  font-size: 12px;
+}

@@ -13,7 +13,7 @@ const Menu = () => {
   };
 
   const handleInicioClick = () => {
-    navigate("/"); // Redirige a la página principal (App.jsx)
+    navigate("/home"); // Redirige a la página principal (App.jsx)
   };
 
   const handleHistoricoClick = () => {
@@ -58,7 +58,7 @@ const Menu = () => {
           ENCUESTA
         </button>
         <button className="menu-button" onClick={handleLogout}>
-          LOGOUT
+          SALIR
         </button>
       </nav>
     </>

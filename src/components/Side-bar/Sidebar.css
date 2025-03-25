@@ -12,12 +12,14 @@
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
-  left: -250px; /* Menú oculto por defecto */
+  left: -250px;
+  /* Menú oculto por defecto */
   transition: left 0.3s ease;
 }
 
 .menu.open {
-  left: 0; /* Menú visible */
+  left: 0;
+  /* Menú visible */
 }
 
 /* Estilos para los botones del menú */
@@ -33,6 +35,7 @@
   transition: background-color 0.3s ease;
   width: 80%;
   color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .menu-button:hover {
@@ -53,10 +56,10 @@
   z-index: 1000;
 }
 
-/* Estilos responsivos (opcional, si quieres ajustar algo en pantallas pequeñas) */
+/* Estilos responsivos */
 @media (max-width: 768px) {
   .menu-toggle {
-    font-size: 20px; /* Ajuste de tamaño en pantallas pequeñas */
+    font-size: 20px;
     padding: 8px;
   }
 }

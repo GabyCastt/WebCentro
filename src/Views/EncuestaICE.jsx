@@ -16,6 +16,11 @@ const EncuestaICE = () => {
     fetchQuestionsAndCompetencias();
   }, []);
 
+  useEffect(() => {
+    // Scroll al inicio cuando cambia la competencia
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentCompetenciaIndex]);
+
   const fetchQuestionsAndCompetencias = async () => {
     try {
       const preguntasResponse = await fetch(
@@ -168,8 +173,8 @@ const EncuestaICE = () => {
       </p>
 
       <p className="ice-instructions">
-        Para el siguiente cuestionario, se manejará una escala de valoración
-        donde:
+        El presente cuestionario tiene el objetivo de evaluar su posibilidad de emprender 
+        adecuadamente una empresa. La forma de responder se especifica en cada caso:
       </p>
 
       <p className="ice-instructions-scale">
@@ -179,43 +184,43 @@ const EncuestaICE = () => {
       </p>
 
       {currentQuestions.map((q, idx) => (
-  <div key={q.idPregunta} className="ice-question-block">
-    <p className="ice-question-text">
-      {idx + 1}. {q.textoPregunta}
-    </p>
-    <div className="ice-answers-container">
-      {getScale(currentCompetenciaId).map((num) => (
-        <div key={num} className="ice-answer-wrapper">
-          <div
-            onClick={() => handleAnswer(q.idPregunta, num)}
-            className={`ice-answer-circle ${
-              answers[q.idPregunta] === num ? "ice-selected" : ""
-            }`}
-          >
-            <span className="ice-answer-label">{num}</span>
+        <div key={q.idPregunta} className="ice-question-block">
+          <p className="ice-question-text">
+            {idx + 1}. {q.textoPregunta}
+          </p>
+          <div className="ice-answers-container">
+            {getScale(currentCompetenciaId).map((num) => (
+              <div key={num} className="ice-answer-wrapper">
+                <div
+                  onClick={() => handleAnswer(q.idPregunta, num)}
+                  className={`ice-answer-circle ${
+                    answers[q.idPregunta] === num ? "ice-selected" : ""
+                  }`}
+                >
+                  <span className="ice-answer-label">{num}</span>
+                </div>
+                <span className="ice-scale-label">
+                  {parseInt(currentCompetenciaId, 10) <= 6
+                    ? num === 1
+                      ? "Nunca"
+                      : num === 2
+                      ? "A veces"
+                      : num === 3
+                      ? "Muchas veces"
+                      : num === 4
+                      ? "Casi siempre"
+                      : "Siempre"
+                    : num === 1
+                    ? "No"
+                    : num === 3
+                    ? "Moderadamente"
+                    : "Sí"}
+                </span>
+              </div>
+            ))}
           </div>
-          <span className="ice-scale-label">
-            {parseInt(currentCompetenciaId, 10) <= 6
-              ? num === 1
-                ? "Nunca"
-                : num === 2
-                ? "A veces"
-                : num === 3
-                ? "Muchas veces"
-                : num === 4
-                ? "Casi siempre"
-                : "Siempre"
-              : num === 1
-              ? "No"
-              : num === 3
-              ? "Moderadamente"
-              : "Sí"}
-          </span>
         </div>
       ))}
-    </div>
-  </div>
-))}
 
       <div className="ice-navigation-buttons">
         {!isFirstCompetencia && (

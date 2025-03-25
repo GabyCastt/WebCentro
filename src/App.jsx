@@ -14,6 +14,7 @@ import EncuestaIEPM from "./Views/EncuestaIEPM.jsx";
 import VentanaEncuestas from "./Views/VentanaEncuestas.jsx";
 import RegistrarRol from "./Views/RegistrarRol";
 import Resultados from "./Views/Resultados";
+import Home from "./Views/Home";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -39,6 +40,7 @@ function App() {
               <Route path="/" element={<Menu />} />
               <Route path="/INICIO" element={<Menu />} /> {/* Cambia <App /> por <Menu /> */}
               <Route path="/historico" element={<HistoricoEmp />} />
+              <Route path="/home" element={<Home />} /> {/* Cambia <App /> por <Menu /> */}
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
               <Route path="/detalles/:idEmprendedor/ventanaencuestas" element={<VentanaEncuestas />} />
               <Route path="/detalles/:idEmprendedor/encuestaice" element={<EncuestaICE />}/>
