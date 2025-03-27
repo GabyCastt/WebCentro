@@ -5,7 +5,7 @@ import "./DetallesEmp.css";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
 
-function DetallesEmp() {
+function DetallesEmprendedor() {
   const { idEmprendedor } = useParams();
   const navigate = useNavigate();
   const [emprendedor, setEmprendedor] = useState(null);
@@ -32,12 +32,11 @@ function DetallesEmp() {
     datosEmps: [], 
   });
 
-  // Rangos de edad para el emprendedor y empleados
   const opcionesRangoEdad = ["18-25", "26-65", "65+"];
-
-  // Rangos de sueldo
   const opcionesRangoSueldo = ["0-460", "460-750", "750-1500"];
-
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     if (!idEmprendedor) {
       console.error("ID no definido");
@@ -92,67 +91,53 @@ function DetallesEmp() {
     });
   };
 
+  const handleEncuestasClick = () => {
+    navigate(`/detalles/${idEmprendedor}/ventanaencuestas`);
+  };
+
   if (loading) {
-    return <div className="loading">Cargando...</div>;
+    return <div className="emprendedor-loading">Cargando...</div>;
   }
 
   if (error) {
     return (
-      <div className="error">
+      <div className="emprendedor-error">
         Error: {error.response ? error.response.data.message : error.message}
       </div>
     );
   }
 
   if (!emprendedor) {
-    return <div>No se encontraron datos del emprendedor.</div>;
+    return <div className="emprendedor-not-found">No se encontraron datos del emprendedor.</div>;
   }
 
-  const handleButton2Click = () => {
-    navigate(`/detalles/${idEmprendedor}/ventanaencuestas`); // Redirige a la encuesta con el idEmprendedor
-  };
-
   return (
-    <div className="App">
+    <div className="emprendedor-app">
       <Header />
       <Sidebar />
-      <main className="detalles-container">
-        <h1>DETALLES EMPRENDEDOR</h1>
-        <div className="info-box">
-          <h2>INFORMACIÓN</h2>
-          <table className="details-table">
+      <main className="emprendedor-container">
+        <h1 className="emprendedor-main-title">DETALLES DEL EMPRENDEDOR</h1>
+        <div className="emprendedor-card">
+          <h2 className="emprendedor-card-header">INFORMACIÓN GENERAL</h2>
+          <table className="emprendedor-details-table">
             <tbody>
-              {/* Nombre */}
-              <tr>
-                <td>NOMBRES Y APELLIDOS:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">NOMBRES Y APELLIDOS:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="nombre"
-                      value={editedEmprendedor.nombre}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="nombre" value={editedEmprendedor.nombre} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.nombre
                   )}
                 </td>
               </tr>
-
-              {/* Edad */}
-              <tr>
-                <td>EDAD:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">EDAD:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select
-                      name="edad"
-                      value={editedEmprendedor.edad}
-                      onChange={handleInputChange}
-                    >
+                    <select name="edad" value={editedEmprendedor.edad} onChange={handleInputChange} className="emprendedor-select">
                       {opcionesRangoEdad.map((opcion, index) => (
-                        <option key={index} value={opcion}>
-                          {opcion}
-                        </option>
+                        <option key={index} value={opcion}>{opcion}</option>
                       ))}
                     </select>
                   ) : (
@@ -160,57 +145,31 @@ function DetallesEmp() {
                   )}
                 </td>
               </tr>
-
-              {/* Nivel de Estudio */}
-              <tr>
-                <td>NIVEL DE ESTUDIO:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">NIVEL DE ESTUDIO:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="nivelEstudio"
-                      value={editedEmprendedor.nivelEstudio}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="nivelEstudio" value={editedEmprendedor.nivelEstudio} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.nivelEstudio
                   )}
                 </td>
               </tr>
-
-              {/* Trabajo Relación Dependencia */}
-              <tr>
-                <td>TRABAJO RELACIÓN DEPENDENCIA:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">TRABAJO RELACIÓN DEPENDENCIA:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="checkbox"
-                      name="trabajoRelacionDependencia"
-                      checked={editedEmprendedor.trabajoRelacionDependencia}
-                      onChange={handleInputChange}
-                    />
-                  ) : emprendedor.trabajoRelacionDependencia ? (
-                    "Sí"
-                  ) : (
-                    "No"
-                  )}
+                    <input type="checkbox" name="trabajoRelacionDependencia" checked={editedEmprendedor.trabajoRelacionDependencia} onChange={handleInputChange} />
+                  ) : emprendedor.trabajoRelacionDependencia ? "Sí" : "No"}
                 </td>
               </tr>
-
-              {/* Sueldo Mensual */}
-              <tr>
-                <td>RANGO DE SUELDO:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">RANGO DE SUELDO:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select
-                      name="sueldoMensual"
-                      value={editedEmprendedor.sueldoMensual}
-                      onChange={handleInputChange}
-                    >
+                    <select name="sueldoMensual" value={editedEmprendedor.sueldoMensual} onChange={handleInputChange} className="emprendedor-select">
                       {opcionesRangoSueldo.map((opcion, index) => (
-                        <option key={index} value={opcion}>
-                          {opcion}
-                        </option>
+                        <option key={index} value={opcion}>{opcion}</option>
                       ))}
                     </select>
                   ) : (
@@ -218,72 +177,43 @@ function DetallesEmp() {
                   )}
                 </td>
               </tr>
-
-              {/* RUC */}
-              <tr>
-                <td>RUC:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">RUC:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="ruc"
-                      value={editedEmprendedor.ruc}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="ruc" value={editedEmprendedor.ruc} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.ruc
                   )}
                 </td>
               </tr>
-
-              {/* Empleados Hombres */}
-              <tr>
-                <td>EMPLEADOS HOMBRES:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">EMPLEADOS HOMBRES:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="number"
-                      name="empleadosHombres"
-                      value={editedEmprendedor.empleadosHombres}
-                      onChange={handleInputChange}
-                    />
+                    <input type="number" name="empleadosHombres" value={editedEmprendedor.empleadosHombres} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     `${emprendedor.empleadosHombres} EMPLEADOS HOMBRES`
                   )}
                 </td>
               </tr>
-
-              {/* Empleados Mujeres */}
-              <tr>
-                <td>EMPLEADOS MUJERES:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">EMPLEADOS MUJERES:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="number"
-                      name="empleadosMujeres"
-                      value={editedEmprendedor.empleadosMujeres}
-                      onChange={handleInputChange}
-                    />
+                    <input type="number" name="empleadosMujeres" value={editedEmprendedor.empleadosMujeres} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     `${emprendedor.empleadosMujeres} EMPLEADAS MUJERES`
                   )}
                 </td>
               </tr>
-
-              {/* Rango de Edad de Empleados */}
-              <tr>
-                <td>RANGO DE EDAD DE EMPLEADOS:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">RANGO DE EDAD DE EMPLEADOS:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select
-                      name="rangoEdadEmpleados"
-                      value={editedEmprendedor.rangoEdadEmpleados}
-                      onChange={handleInputChange}
-                    >
+                    <select name="rangoEdadEmpleados" value={editedEmprendedor.rangoEdadEmpleados} onChange={handleInputChange} className="emprendedor-select">
                       {opcionesRangoEdad.map((opcion, index) => (
-                        <option key={index} value={opcion}>
-                          {opcion}
-                        </option>
+                        <option key={index} value={opcion}>{opcion}</option>
                       ))}
                     </select>
                   ) : (
@@ -291,120 +221,71 @@ function DetallesEmp() {
                   )}
                 </td>
               </tr>
-
-              {/* Tipo de Empresa */}
-              <tr>
-                <td>TIPO DE EMPRESA:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">TIPO DE EMPRESA:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="tipoEmpresa"
-                      value={editedEmprendedor.tipoEmpresa}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="tipoEmpresa" value={editedEmprendedor.tipoEmpresa} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.tipoEmpresa
                   )}
                 </td>
               </tr>
-
-              {/* Año de Creación de la Empresa */}
-              <tr>
-                <td>AÑO DE CREACIÓN DE LA EMPRESA:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">AÑO DE CREACIÓN DE LA EMPRESA:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="number"
-                      name="anoCreacionEmpresa"
-                      value={editedEmprendedor.anoCreacionEmpresa}
-                      onChange={handleInputChange}
-                    />
+                    <input type="number" name="anoCreacionEmpresa" value={editedEmprendedor.anoCreacionEmpresa} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.anoCreacionEmpresa
                   )}
                 </td>
               </tr>
-
-              {/* Dirección */}
-              <tr>
-                <td>DIRECCIÓN:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">DIRECCIÓN:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="direccion"
-                      value={editedEmprendedor.direccion}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="direccion" value={editedEmprendedor.direccion} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.direccion
                   )}
                 </td>
               </tr>
-
-              {/* Teléfono */}
-              <tr>
-                <td>TELÉFONO:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">TELÉFONO:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="telefono"
-                      value={editedEmprendedor.telefono}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="telefono" value={editedEmprendedor.telefono} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.telefono
                   )}
                 </td>
               </tr>
-
-              {/* Celular */}
-              <tr>
-                <td>CELULAR:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">CELULAR:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="celular"
-                      value={editedEmprendedor.celular}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="celular" value={editedEmprendedor.celular} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.celular
                   )}
                 </td>
               </tr>
-
-              {/* Correo */}
-              <tr>
-                <td>CORREO:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">CORREO:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="email"
-                      name="correo"
-                      value={editedEmprendedor.correo}
-                      onChange={handleInputChange}
-                    />
+                    <input type="email" name="correo" value={editedEmprendedor.correo} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.correo
                   )}
                 </td>
               </tr>
-
-              {/* Cédula */}
-              <tr>
-                <td>CÉDULA:</td>
-                <td>
+              <tr className="emprendedor-detail-row">
+                <td className="emprendedor-detail-label">CÉDULA:</td>
+                <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
-                      name="cedula"
-                      value={editedEmprendedor.cedula}
-                      onChange={handleInputChange}
-                    />
+                    <input type="text" name="cedula" value={editedEmprendedor.cedula} onChange={handleInputChange} className="emprendedor-input" />
                   ) : (
                     emprendedor.cedula
                   )}
@@ -413,20 +294,17 @@ function DetallesEmp() {
             </tbody>
           </table>
         </div>
-        <div className="button-group">
-          <button
-            className="edit-btn"
-            onClick={isEditing ? handleSaveClick : handleEditClick}
-          >
-            {isEditing ? "Guardar" : "EDITAR"}
+        <div className="emprendedor-actions-container">
+          <button className="emprendedor-action-btn emprendedor-edit-btn" onClick={isEditing ? handleSaveClick : handleEditClick}>
+            {isEditing ? "Guardar Cambios" : "Editar Información"}
           </button>
-          <button className="report-btn">Generar Reporte</button>
-          <button onClick={handleButton2Click}>Encuestas</button>
-          <button className="back-btn" onClick={() => navigate(-1)}> Regresar </button>
+          <button className="emprendedor-action-btn emprendedor-report-btn">Generar Reporte PDF</button>
+          <button className="emprendedor-action-btn emprendedor-survey-btn" onClick={handleEncuestasClick}>Ver Encuestas</button>
+          <button className="emprendedor-action-btn emprendedor-back-btn" onClick={() => navigate(-1)}>Volver al Listado</button>
         </div>
       </main>
     </div>
   );
 }
 
-export default DetallesEmp;
+export default DetallesEmprendedor;

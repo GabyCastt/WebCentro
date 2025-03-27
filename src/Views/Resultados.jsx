@@ -5,17 +5,21 @@ import Sidebar from "../components/Side-bar/Sidebar";
 import { useParams } from "react-router-dom";
 
 const Resultados = () => {
-  const { idEmprendedor } = useParams(); 
+  const { idEmprendedor } = useParams();
   const [resultados, setResultados] = useState([]);
-  const [emprendedor, setEmprendedor] = useState(null); 
+  const [emprendedor, setEmprendedor] = useState(null);
   const [loading, setLoading] = useState(true);
-
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Obtener los resultados de la API y los datos del emprendedor
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Obtener resultados de la encuesta ICE
-        const resultadosResponse = await fetch(`https://localhost:7075/api/ResultadosIce`);
+        const resultadosResponse = await fetch(
+          `https://localhost:7075/api/ResultadosIce`
+        );
         if (!resultadosResponse.ok) {
           throw new Error("Error al obtener los resultados");
         }
@@ -26,7 +30,9 @@ const Resultados = () => {
         setResultados(resultadosFiltrados);
 
         // Obtener datos del emprendedor
-        const emprendedorResponse = await fetch(`https://localhost:7075/api/Emprendedores/${idEmprendedor}`);
+        const emprendedorResponse = await fetch(
+          `https://localhost:7075/api/Emprendedores/${idEmprendedor}`
+        );
         if (!emprendedorResponse.ok) {
           throw new Error("Error al obtener los datos del emprendedor");
         }
@@ -51,15 +57,49 @@ const Resultados = () => {
 
   // Función para calcular el ICE General (suma de todas las competencias)
   const calcularIceGeneral = () => {
-    const total = resultados.reduce((sum, r) => sum + r.puntuacionCompetencia, 0);
+    const total = resultados.reduce(
+      (sum, r) => sum + r.puntuacionCompetencia,
+      0
+    );
     return total.toFixed(2);
+  };
+
+  // Función para determinar el nivel y acciones según el ICE General
+  const getNivelIceGeneral = () => {
+    const iceGeneral = parseFloat(calcularIceGeneral());
+    if (iceGeneral >= 0 && iceGeneral < 0.6) {
+      return {
+        nivel: "Bajo",
+        valoracion:
+          "Baja competencia emprendedora, muy baja Mediana competencia",
+        acciones: "Falta desarrollar las competencias",
+      };
+    } else if (iceGeneral >= 0.6 && iceGeneral < 0.8) {
+      return {
+        nivel: "Medio",
+        valoracion: "Mediana competencia para Alta competencia",
+        acciones: "Se cumple con las competencias",
+      };
+    } else if (iceGeneral >= 0.8 && iceGeneral <= 1) {
+      return {
+        nivel: "Alto",
+        valoracion: "Alta competencia",
+        acciones: "Se cumple con las competencias",
+      };
+    } else {
+      return {
+        nivel: "N/A",
+        valoracion: "N/A",
+        acciones: "N/A",
+      };
+    }
   };
 
   // Función para calcular el IEPM (se debe ajustar a lo que necesitemos)
   const calcularIepm = () => {
-
     return "N/A"; // Placeholder
   };
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   // Función para formatear la fecha actual
   const getFechaActual = () => {
@@ -74,6 +114,8 @@ const Resultados = () => {
   if (loading) {
     return <div className="loading">Cargando resultados...</div>;
   }
+
+  const iceGeneralInfo = getNivelIceGeneral();
 
   return (
     <div className="results-container">
@@ -101,10 +143,12 @@ const Resultados = () => {
               <span className="data-box">{getValorCompetencia(1)}</span>
             </p>
             <p>
-              Creatividad → <span className="data-box">{getValorCompetencia(2)}</span>
+              Creatividad →{" "}
+              <span className="data-box">{getValorCompetencia(2)}</span>
             </p>
             <p>
-              Liderazgo → <span className="data-box">{getValorCompetencia(3)}</span>
+              Liderazgo →{" "}
+              <span className="data-box">{getValorCompetencia(3)}</span>
             </p>
             <p>
               Personalidad Proactiva →{" "}
@@ -149,7 +193,7 @@ const Resultados = () => {
               <tr>
                 <td>ICE General</td>
                 <td>{calcularIceGeneral()}</td>
-                <td>-</td>
+                <td>{iceGeneralInfo.acciones}</td>
               </tr>
               <tr>
                 <td>IEPM</td>
@@ -159,20 +203,119 @@ const Resultados = () => {
             </tbody>
           </table>
 
-          {/* Gráfico de ICE General */}
-          <div className="ice-general-chart">
-            <h4>VALORES ICE</h4>
-            <div className="bar-chart">
-              {resultados.map((resultado) => (
-                <div
-                  key={resultado.idCompetencia}
-                  className="bar"
-                  style={{
-                    height: `${resultado.puntuacionCompetencia * 100}%`,
-                    backgroundColor: "#C14600",
-                  }}
-                ></div>
-              ))}
+          <div className="pie-chart-container">
+            <h4>VALORACIÓN ICE</h4>
+            {activeTooltip && (
+              <div className="custom-tooltip">
+                {activeTooltip.competencia}: {activeTooltip.percentage}%
+              </div>
+            )}
+            <div className="pie-chart-wrapper">
+              <div className="pie-chart">
+                {resultados.map((resultado, index) => {
+                  const competencias = [
+                    "Comportamiento Emprendedor",
+                    "Creatividad",
+                    "Liderazgo",
+                    "Personalidad Proactiva",
+                    "Tolerancia a la incertidumbre",
+                    "Trabajo en Equipo",
+                    "Pensamiento Estratégico",
+                    "Proyección Social",
+                    "Orientación Financiera",
+                    "Orientación Tecnológica e innovación",
+                  ];
+
+                  const colors = [
+                    "#FF6E6E",
+                    "#D05AFF",
+                    "#6A8CFF",
+                    "#4DDBFF",
+                    "#7CFFCB",
+                    "#F4FF81",
+                    "#FFE066",
+                    "#FF9E66",
+                    "#FF7BAC",
+                    "#66FFA6",
+                  ];
+
+                  const percentage =
+                    (resultado.puntuacionCompetencia / calcularIceGeneral()) *
+                    100;
+                  const offset = resultados.slice(0, index).reduce((acc, r) => {
+                    return (
+                      acc +
+                      (r.puntuacionCompetencia / calcularIceGeneral()) * 360
+                    );
+                  }, 0);
+
+                  return (
+                    <div
+                      key={resultado.idCompetencia}
+                      className="pie-slice"
+                      style={{
+                        backgroundColor: colors[index],
+                        transform: `rotate(${offset}deg)`,
+                        clipPath: `conic-gradient(${colors[index]} 0% ${percentage}%, transparent ${percentage}% 100%)`,
+                      }}
+                      onMouseEnter={() =>
+                        setActiveTooltip({
+                          competencia:
+                            competencias[resultado.idCompetencia - 1],
+                          percentage: percentage.toFixed(1),
+                        })
+                      }
+                      onMouseLeave={() => setActiveTooltip(null)}
+                    ></div>
+                  );
+                })}
+              </div>
+
+              <div className="pie-legend">
+                {resultados.map((resultado, index) => {
+                  const competencias = [
+                    "Comportamiento Emprendedor",
+                    "Creatividad",
+                    "Liderazgo",
+                    "Personalidad Proactiva",
+                    "Tolerancia a la incertidumbre",
+                    "Trabajo en Equipo",
+                    "Pensamiento Estratégico",
+                    "Proyección Social",
+                    "Orientación Financiera",
+                    "Orientación Tecnológica e innovación",
+                  ];
+
+                  const colors = [
+                    "#FF6E6E",
+                    "#D05AFF",
+                    "#6A8CFF",
+                    "#4DDBFF",
+                    "#7CFFCB",
+                    "#F4FF81",
+                    "#FFE066",
+                    "#FF9E66",
+                    "#FF7BAC",
+                    "#66FFA6",
+                  ];
+
+                  const percentage =
+                    (resultado.puntuacionCompetencia / calcularIceGeneral()) *
+                    100;
+
+                  return (
+                    <div key={resultado.idCompetencia} className="legend-item">
+                      <span
+                        className="legend-color"
+                        style={{ backgroundColor: colors[index] }}
+                      ></span>
+                      <span className="legend-label">
+                        {competencias[index]} ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

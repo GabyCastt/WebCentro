@@ -37,10 +37,10 @@ function App() {
             <Route path="/RegistrarRol" element={<RegistrarRol setUser={setUser} />} />
 
             <Route path="/" element={<PrivateRoute user={user} />}>
-              <Route path="/" element={<Menu />} />
-              <Route path="/INICIO" element={<Menu />} /> {/* Cambia <App /> por <Menu /> */}
+              <Route path="/" element={<Home />} />
+              <Route path="/INICIO" element={<Home />} />
               <Route path="/historico" element={<HistoricoEmp />} />
-              <Route path="/home" element={<Home />} /> {/* Cambia <App /> por <Menu /> */}
+              <Route path="/home" element={<Home />} />
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
               <Route path="/detalles/:idEmprendedor/ventanaencuestas" element={<VentanaEncuestas />} />
               <Route path="/detalles/:idEmprendedor/encuestaice" element={<EncuestaICE />}/>

@@ -23,9 +23,6 @@ const Menu = () => {
   const handleRegistroClick = () => {
     navigate("/registroemp"); // Redirige a la ruta /registroemp
   };
-  const handleEncuestaClick = () => {
-    navigate("/encuesta"); // Redirige a la ruta /historico
-  };
 
   const handleLogout = () => {
     setUser(null); // Elimina el usuario del estado global
@@ -52,10 +49,6 @@ const Menu = () => {
         </button>
         <button className="menu-button" onClick={handleRegistroClick}>
           NUEVO REGISTRO EMPRENDEDOR
-        </button>
-
-        <button className="menu-button" onClick={handleEncuestaClick}>
-          ENCUESTA
         </button>
         <button className="menu-button" onClick={handleLogout}>
           SALIR

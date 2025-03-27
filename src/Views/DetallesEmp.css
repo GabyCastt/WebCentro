@@ -1,76 +1,167 @@
-.detalles-container {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .info-box {
-    background-color: #f4f4f4;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: inline-block;
-    text-align: center;
-  }
-  
-  .details-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+/* DetallesEmp.css - Estilos para el componente DetallesEmprendedor */
 
+.emprendedor-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.emprendedor-container {
+  margin-left: 250px; /* Ajuste para el sidebar */
+  padding: 2rem;
+  flex: 1;
+}
+
+.emprendedor-main-title {
+  color: #140E4E;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+  font-family: Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.emprendedor-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.emprendedor-card-header {
+  color: #9e1b32;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.emprendedor-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.emprendedor-detail-row {
+  border-bottom: 1px solid #eee;
+}
+
+.emprendedor-detail-row:last-child {
+  border-bottom: none;
+}
+
+.emprendedor-detail-label {
+  padding: 1rem 0;
+  width: 35%;
+  font-weight: 600;
+  color: #555;
+}
+
+.emprendedor-detail-value {
+  padding: 1rem 0;
+  color: #333;
+}
+
+.emprendedor-input, .emprendedor-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.emprendedor-input:focus, .emprendedor-select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.emprendedor-actions-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.emprendedor-action-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.emprendedor-edit-btn {
+  background-color: #140E4E;
+  color: white;
+}
+
+.emprendedor-edit-btn:hover {
+  background-color: #2980b9;
+}
+
+.emprendedor-report-btn {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.emprendedor-report-btn:hover {
+  background-color: #27ae60;
+}
+
+.emprendedor-survey-btn {
+  background-color: #9e1b32;
+  color: white;
+}
+
+.emprendedor-survey-btn:hover {
+  background-color: #b9475c;
+}
+
+.emprendedor-back-btn {
+  background-color: #c4b17e;
+  color: rgb(12, 11, 11);
+}
+
+.emprendedor-back-btn:hover {
+  background-color: #c7b78f;
+}
+
+.emprendedor-loading,
+.emprendedor-error,
+.emprendedor-not-found {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.emprendedor-error {
+  color: #e74c3c;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .emprendedor-container {
+    margin-left: 0;
+    padding: 1rem;
   }
   
-  .details-table td {
-    padding: 10px;
-    border: 1px solid #B7B0B0;
+  .emprendedor-actions-container {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .button-group {
-    margin-top: 2px;
-    display: flex;
-    justify-content: space-around;
+  .emprendedor-action-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
   }
   
-  .button-group button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 16px;
+  .emprendedor-detail-label {
+    width: 50%;
   }
-  
-  .edit-btn {
-    background-color: #140E4E;
-    color: white;
-  }
-  
-  .report-btn {
-    background-color: #140E4E;
-    color: white;
-  }
-  
-  .survey-btn {
-    background-color: #140E4E;
-    color: white;
-  }
-  .back-btn {
-    background-color: #28a745; 
-    color: white; 
-    border: none; 
-    border-radius: 50%;
-    width: 90px; 
-    height: 60px;
-    font-size: 16px; 
-    cursor: pointer; 
-    position: fixed; 
-    right: 50px; 
-    bottom: 70px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    box-shadow: 0 10px 8px rgba(0, 0, 0, 0.2); 
-    transition: background-color 0.3s ease; 
-  }
-  
-  .back-btn:hover {
-    background-color: #218838;
-  }
+}

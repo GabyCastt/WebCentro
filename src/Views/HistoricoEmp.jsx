@@ -10,7 +10,9 @@ function HistoricoEmp() {
   const [emprendedores, setEmprendedores] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); 
-
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     const fetchEmprendedores = async () => {
       try {
@@ -28,7 +30,8 @@ function HistoricoEmp() {
   }, []);
 
   const filteredEmprendedores = emprendedores.filter((emprendedor) =>
-    emprendedor.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    emprendedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (emprendedor.correo && emprendedor.correo.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleDetailsClick = (idEmprendedor) => {
@@ -58,51 +61,48 @@ function HistoricoEmp() {
   };
 
   return (
-    <div className="App">
+    <div className="historico-container">
       <Header />
       <Sidebar />
-      <main>
-        <h1>HISTÓRICO EMPRENDEDORES</h1>
+      <main className="historico-main-content">
+        <h1 className="historico-title">HISTÓRICO EMPRENDEDORES</h1>
         <input
           type="text"
-          placeholder="Buscar por nombre..."
+          className="historico-search-input"
+          placeholder="Buscar por nombre o correo..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <table className="table">
-          <thead>
+        <table className="historico-table">
+          <thead className="historico-table-header">
             <tr>
-              <th>Fecha</th>
+              <th>#</th>
               <th>Nombre Emprendedor</th>
+              <th>Correo</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredEmprendedores.length > 0 ? (
               filteredEmprendedores.map((emprendedor) => (
-                <tr key={emprendedor.idEmprendedor}>
-                  <td>{emprendedor.fecha}</td>
-                  <td>{emprendedor.nombre}</td>
-                  <td>
+                <tr key={emprendedor.idEmprendedor} className="historico-table-row">
+                  <td className="historico-table-cell">{emprendedor.fecha}</td>
+                  <td className="historico-table-cell">{emprendedor.nombre}</td>
+                  <td className="historico-table-cell">{emprendedor.correo || 'No registrado'}</td>
+                  <td className="historico-table-cell">
                     <button
-                      className="btn btn-outline-info"
+                      className="historico-action-btn historico-details-btn"
                       onClick={() => handleDetailsClick(emprendedor.idEmprendedor)}
                     >
                       Detalles
-                    </button>
-                    <button
-                      className="btn btn-outline-danger"
-                      onClick={() => handleDeleteClick(emprendedor.idEmprendedor)}
-                    >
-                      Eliminar
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="3" style={{ textAlign: "center", padding: "10px" }}>
+                <td colSpan="4" className="historico-no-data">
                   No hay datos disponibles.
                 </td>
               </tr>
@@ -110,9 +110,9 @@ function HistoricoEmp() {
           </tbody>
         </table>
 
-        <div className="button-container">
-          <button onClick={handleButton1Click}>Reporte General</button>
-          <button onClick={handleButton2Click}>Añadir Emprendedor</button>
+        <div className="historico-actions-container">
+          <button className="historico-primary-btn historico-report-btn" onClick={handleButton1Click}>Reporte General</button>
+          <button className="historico-primary-btn historico-add-btn" onClick={handleButton2Click}>Añadir Emprendedor</button>
         </div>
       </main>
     </div>

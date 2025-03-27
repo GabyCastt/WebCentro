@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Home.css";
 import Sidebar from "../components/Side-bar/Sidebar";
 import LogoCentro from "../assets/LogoCentro.jpg";
@@ -8,6 +8,9 @@ import grupo3 from "../assets/grupo3.jpg";
 import personas2 from "../assets/personas2.jpg";
 
 const Home = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="app-container">
       <Sidebar />
