@@ -374,8 +374,46 @@ h4 {
   }
 }
 
+/* Estilos para impresión */
 @media print {
-  .bar-chart-3d {
-      display: block !important;
+  /* Ocultar elementos no necesarios en impresión */
+  .header, .sidebar, .buttons {
+    display: none !important;
+  }
+
+  /* Asegurar que el contenido principal ocupe todo el ancho */
+  .results-box {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ajustar el gráfico para impresión */
+  .pie-chart-container {
+    page-break-inside: avoid; /* Evitar que se divida en páginas */
+    width: 100% !important;
+  }
+
+  /* Asegurar que las tablas se impriman completas */
+  table {
+    page-break-inside: auto !important;
+  }
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  /* Ajustar márgenes generales */
+  body {
+    margin: 0.5cm !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Asegurar que los colores del gráfico sean visibles */
+  .pie-slice, .legend-color {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }

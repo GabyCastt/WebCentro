@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
@@ -19,8 +19,11 @@ const Resultados = () => {
   });
   const [iepmData, setIepmData] = useState(null);
   const [showIEPM, setShowIEPM] = useState(false);
+  const [encuestasIEPM, setEncuestasIEPM] = useState([]);
+  const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] = useState(null);
+  const printRef = useRef();
 
-  // Efecto para cargar las encuestas disponibles
+  // Efecto para cargar las encuestas disponibles ICE
   useEffect(() => {
     const fetchEncuestas = async () => {
       try {
@@ -36,7 +39,6 @@ const Resultados = () => {
 
         const data = await response.json();
 
-        // Adaptamos el formato [1, 2] a objetos con idEncuesta
         const encuestasFormateadas = Array.isArray(data)
           ? data.map((id) => ({ idEncuesta: id }))
           : [];
@@ -50,11 +52,11 @@ const Resultados = () => {
           setStatus((prev) => ({ ...prev, loading: false }));
         }
       } catch (err) {
-        console.error("Error al cargar encuestas:", err);
+        console.error("Error al cargar encuestas ICE:", err);
         setStatus((prev) => ({
           ...prev,
           loading: false,
-          error: `Error al cargar encuestas: ${err.message}`,
+          error: `Error al cargar encuestas ICE: ${err.message}`,
         }));
       }
     };
@@ -62,7 +64,41 @@ const Resultados = () => {
     fetchEncuestas();
   }, [idEmprendedor]);
 
-  // Efecto para cargar resultados cuando se selecciona una encuesta
+  // Efecto para cargar las encuestas disponibles IEPM
+  useEffect(() => {
+    const fetchEncuestasIEPM = async () => {
+      try {
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
+
+        const response = await fetch(
+          `https://localhost:7075/api/IepmCalculation/Encuestas/${idEmprendedor}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        setEncuestasIEPM(data);
+        
+        if (data.length > 0) {
+          setEncuestaSeleccionadaIEPM(data[0].idEncuesta);
+        }
+      } catch (err) {
+        console.error("Error al cargar encuestas IEPM:", err);
+        setStatus((prev) => ({
+          ...prev,
+          error: `Error al cargar encuestas IEPM: ${err.message}`,
+        }));
+      } finally {
+        setStatus((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchEncuestasIEPM();
+  }, [idEmprendedor]);
+
+  // Efecto para cargar resultados ICE cuando se selecciona una encuesta
   useEffect(() => {
     const fetchData = async () => {
       if (!encuestaSeleccionada) return;
@@ -85,7 +121,6 @@ const Resultados = () => {
 
         const resultadosData = await resultadosRes.json();
 
-        // Asegurarnos de que siempre trabajamos con un array
         const resultadosArray = Array.isArray(resultadosData)
           ? resultadosData
           : resultadosData.resultados || resultadosData.data || [];
@@ -98,11 +133,11 @@ const Resultados = () => {
           error: null,
         }));
       } catch (err) {
-        console.error("Error al cargar datos:", err);
+        console.error("Error al cargar datos ICE:", err);
         setStatus((prev) => ({
           ...prev,
           loading: false,
-          error: `Error al cargar datos: ${err.message}`,
+          error: `Error al cargar datos ICE: ${err.message}`,
         }));
       }
     };
@@ -110,32 +145,38 @@ const Resultados = () => {
     fetchData();
   }, [idEmprendedor, encuestaSeleccionada]);
 
-  // Función para cargar los resultados IEPM
-  const fetchIEPMData = async () => {
-    try {
-      setStatus((prev) => ({ ...prev, loading: true, error: null }));
+  // Efecto para cargar resultados IEPM cuando se selecciona una encuesta
+  useEffect(() => {
+    const fetchIEPMData = async () => {
+      if (!encuestaSeleccionadaIEPM) return;
 
-      const response = await fetch(
-        `https://localhost:7075/api/PreguntasIepm/ResultadosCompletos/${idEmprendedor}`
-      );
+      try {
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${await response.text()}`);
+        const response = await fetch(
+          `https://localhost:7075/api/PreguntasIepm/ResultadosCompletos/${idEmprendedor}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        setIepmData(data);
+        setShowIEPM(true);
+      } catch (error) {
+        console.error("Error al cargar resultados IEPM:", error);
+        setStatus((prev) => ({
+          ...prev,
+          error: `Error al cargar IEPM: ${error.message}`,
+        }));
+      } finally {
+        setStatus((prev) => ({ ...prev, loading: false }));
       }
+    };
 
-      const data = await response.json();
-      setIepmData(data);
-      setShowIEPM(true);
-      setStatus((prev) => ({ ...prev, loading: false }));
-    } catch (error) {
-      console.error("Error al cargar resultados IEPM:", error);
-      setStatus((prev) => ({
-        ...prev,
-        loading: false,
-        error: `Error al cargar IEPM: ${error.message}`,
-      }));
-    }
-  };
+    fetchIEPMData();
+  }, [idEmprendedor, encuestaSeleccionadaIEPM]);
 
   // Función para obtener el valor de una competencia específica
   const getValorCompetencia = (idCompetencia) => {
@@ -186,6 +227,24 @@ const Resultados = () => {
     }
   };
 
+  // Función para manejar la impresión
+  const handlePrint = () => {
+    const originalTitle = document.title;
+    document.title = `Resultados_${emprendedor?.nombre || 'Emprendedor'}_${new Date().toLocaleDateString()}`;
+    
+    // Temporarily hide elements not needed in print
+    const elementsToHide = document.querySelectorAll('.no-print');
+    elementsToHide.forEach(el => el.style.display = 'none');
+    
+    window.print();
+    
+    // Restore after printing
+    setTimeout(() => {
+      document.title = originalTitle;
+      elementsToHide.forEach(el => el.style.display = '');
+    }, 1000);
+  };
+
   if (status.error) {
     return (
       <div className="results-container">
@@ -216,7 +275,7 @@ const Resultados = () => {
     );
   }
 
-  if (encuestas.length === 0) {
+  if (encuestas.length === 0 && encuestasIEPM.length === 0) {
     return (
       <div className="results-container">
         <Header />
@@ -256,17 +315,31 @@ const Resultados = () => {
 
   return (
     <div className="results-container">
-      <Header />
+      <Header className="no-print" />
       <div className="results-layout">
-        <Sidebar />
-        <div className="results-box">
+        <Sidebar className="no-print" />
+        <div className="results-box" ref={printRef}>
           <h2>RESULTADOS FINALES</h2>
 
-          {/* Selector de encuestas */}
-          <div className="encuesta-selector">
-            <label htmlFor="select-encuesta">Seleccione una encuesta: </label>
+          {/* Información del emprendedor */}
+          <div className="results-info print-header">
+            <p>
+              <strong>Emprendedor:</strong>{" "}
+              <span className="data-box">
+                {emprendedor ? emprendedor.nombre : "N/A"}
+              </span>
+            </p>
+            <p>
+              <strong>Fecha de generación:</strong>{" "}
+              <span className="data-box">{new Date().toLocaleDateString()}</span>
+            </p>
+          </div>
+
+          {/* Selector de encuestas ICE */}
+          <div className="encuesta-selector no-print">
+            <label htmlFor="select-encuesta-ice">Seleccione una encuesta ICE: </label>
             <select
-              id="select-encuesta"
+              id="select-encuesta-ice"
               value={encuestaSeleccionada || ""}
               onChange={(e) =>
                 setEncuestaSeleccionada(parseInt(e.target.value))
@@ -281,33 +354,53 @@ const Resultados = () => {
             </select>
           </div>
 
-          {/* Información del emprendedor */}
-          <div className="results-info">
-            <p>
-              Emprendedor:{" "}
-              <span className="data-box">
-                {emprendedor ? emprendedor.nombre : "N/A"}
-              </span>
-            </p>
-            <p>
-              Encuesta seleccionada:{" "}
-              <span className="data-box">{encuestaSeleccionada || "N/A"}</span>
-            </p>
-          </div>
-          {/* Resultados por dimensión */}
-          <h3>CÁLCULO ICE POR DIMENSIÓN:</h3>
-          <div className="ice-dimensions">
-            {competenciasNombres.map((nombre, index) => (
-              <p key={index}>
-                {nombre} →{" "}
-                <span className="data-box">
-                  {getValorCompetencia(index + 1)}
-                </span>
-              </p>
-            ))}
+          {/* Selector de encuestas IEPM */}
+          <div className="encuesta-selector no-print">
+            <label htmlFor="select-encuesta-iepm">Seleccione una encuesta IEPM: </label>
+            <select
+              id="select-encuesta-iepm"
+              value={encuestaSeleccionadaIEPM || ""}
+              onChange={(e) =>
+                setEncuestaSeleccionadaIEPM(parseInt(e.target.value))
+              }
+              disabled={status.loading}
+            >
+              {encuestasIEPM.map((encuesta) => (
+                <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
+                  Encuesta {encuesta.idEncuesta} - {new Date(encuesta.fechaAplicacion).toLocaleDateString()}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Gráfico de pastel */}
+          {/* Información de encuestas seleccionadas */}
+          <div className="print-only encuestas-info">
+            <p>
+              <strong>Encuesta ICE seleccionada:</strong>{" "}
+              <span className="data-box">{encuestaSeleccionada || "N/A"}</span>
+            </p>
+            <p>
+              <strong>Encuesta IEPM seleccionada:</strong>{" "}
+              <span className="data-box">{encuestaSeleccionadaIEPM || "N/A"}</span>
+            </p>
+          </div>
+
+          {/* Resultados por dimensión ICE */}
+          <div className="results-section">
+            <h3>CÁLCULO ICE POR DIMENSIÓN:</h3>
+            <div className="ice-dimensions">
+              {competenciasNombres.map((nombre, index) => (
+                <p key={index}>
+                  {nombre} →{" "}
+                  <span className="data-box">
+                    {getValorCompetencia(index + 1)}
+                  </span>
+                </p>
+              ))}
+            </div>
+          </div>
+
+          {/* Gráfico de pastel ICE */}
           <div className="pie-chart-container">
             <h4>VALORACIÓN ICE</h4>
             {activeTooltip && (
@@ -370,35 +463,32 @@ const Resultados = () => {
               </div>
             </div>
           </div>
-          {/* Botón para mostrar resultados IEPM */}
-          <div className="iepm-button-container">
-            <button
-              onClick={fetchIEPMData}
-              className="iepm-button"
-              disabled={status.loading}
-            >
-              {showIEPM ? "Ocultar IEPM" : "Mostrar Resultados IEPM"}
-            </button>
-          </div>
+
           {/* Sección de resultados IEPM */}
           {showIEPM && iepmData && (
             <div className="iepm-results-section">
               <h3>RESULTADOS IEPM</h3>
 
+              {/* Resultado total */}
+              <div className="iepm-total">
+                <h4>Resultado General</h4>
+                <div className="total-card">
+                  <p><strong>Puntaje:</strong> {iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}</p>
+                  <p><strong>Porcentaje:</strong> {iepmData.resultadoTotal?.porcentaje?.toFixed(1) || "N/A"}%</p>
+                  <p><strong>Valoración:</strong> {iepmData.resultadoTotal?.valoracion || "N/A"}</p>
+                  <p><strong>Criterio:</strong> {iepmData.resultadoTotal?.criterio || "N/A"}</p>
+                </div>
+              </div>
+
               {/* Por dimensión */}
               <div className="iepm-dimensions">
                 <h4>Por Dimensión</h4>
                 <div className="dimensions-grid">
-                  {iepmData.porDimension.map((dimension, index) => (
+                  {iepmData.porDimension?.map((dimension, index) => (
                     <div key={index} className="dimension-card">
                       <h5>{dimension.dimension}</h5>
-                      <p>
-                        <strong>Puntaje:</strong> {dimension.puntaje.toFixed(2)}
-                      </p>
-                      <p>
-                        <strong>Porcentaje:</strong>{" "}
-                        {dimension.porcentaje.toFixed(2)}%
-                      </p>
+                      <p><strong>Puntaje:</strong> {dimension.puntaje?.toFixed(3) || "N/A"}</p>
+                      <p><strong>Porcentaje:</strong> {dimension.porcentaje?.toFixed(1) || "N/A"}%</p>
                     </div>
                   ))}
                 </div>
@@ -417,12 +507,12 @@ const Resultados = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {iepmData.porIndicador.map((indicador, index) => (
+                    {iepmData.porIndicador?.map((indicador, index) => (
                       <tr key={index}>
                         <td>{indicador.indicador}</td>
                         <td>{indicador.dimension}</td>
-                        <td>{indicador.puntaje.toFixed(2)}</td>
-                        <td>{indicador.porcentaje.toFixed(2)}%</td>
+                        <td>{indicador.puntaje?.toFixed(3) || "N/A"}</td>
+                        <td>{indicador.porcentaje?.toFixed(1) || "N/A"}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -433,53 +523,48 @@ const Resultados = () => {
               <div className="iepm-recommendations">
                 <h4>Acciones Recomendadas</h4>
                 <div className="recommendations-card">
-                  <p>
-                    <strong>Descripción:</strong>{" "}
-                    {iepmData.accionRecomendada.descripcion}
-                  </p>
-                  <p>
-                    <strong>Recomendaciones:</strong>{" "}
-                    {iepmData.accionRecomendada.recomendaciones}
-                  </p>
-                  <p>
-                    <strong>Rango:</strong> {iepmData.accionRecomendada.rango}
-                  </p>
+                  <p><strong>Descripción:</strong> {iepmData.accionRecomendada?.descripcion || "N/A"}</p>
+                  <p><strong>Recomendaciones:</strong> {iepmData.accionRecomendada?.recomendaciones || "N/A"}</p>
+                  <p><strong>Rango:</strong> {iepmData.accionRecomendada?.rango || "N/A"}</p>
                 </div>
               </div>
             </div>
           )}
-       {/* Resultado general */}
-<h3>RESULTADO GENERAL</h3>
-<table className="results-table">
-  <thead>
-    <tr>
-      <th>INDICADOR</th>
-      <th>VALOR</th>
-      <th>NIVEL</th>
-      <th>ACCIONES</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>ICE General</td>
-      <td>{calcularIceGeneral().toFixed(2)}</td>
-      <td>{iceGeneralInfo.nivel}</td>
-      <td>{iceGeneralInfo.acciones}</td>
-    </tr>
-    {iepmData && (
-      <tr>
-        <td>IEPM Total</td>
-        <td>{iepmData.resultadoTotal.puntaje.toFixed(2)}</td>
-        <td>{iepmData.resultadoTotal.valoracion}</td>
-        <td>{iepmData.accionRecomendada.recomendaciones}</td>
-      </tr>
-    )}
-  </tbody>
-</table>
+
+          {/* Resultado general */}
+          <div className="results-section">
+            <h3>RESULTADO GENERAL</h3>
+            <table className="results-table">
+              <thead>
+                <tr>
+                  <th>INDICADOR</th>
+                  <th>VALOR</th>
+                  <th>NIVEL</th>
+                  <th>ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ICE General</td>
+                  <td>{calcularIceGeneral().toFixed(2)}</td>
+                  <td>{iceGeneralInfo.nivel}</td>
+                  <td>{iceGeneralInfo.acciones}</td>
+                </tr>
+                {iepmData && (
+                  <tr>
+                    <td>IEPM Total</td>
+                    <td>{iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}</td>
+                    <td>{iepmData.resultadoTotal?.valoracion || "N/A"}</td>
+                    <td>{iepmData.accionRecomendada?.recomendaciones || "N/A"}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
           
           {/* Botones de acción */}
-          <div className="buttons">
-            <button onClick={() => window.print()} className="print-button">
+          <div className="buttons no-print">
+            <button onClick={handlePrint} className="print-button">
               Imprimir
             </button>
           </div>

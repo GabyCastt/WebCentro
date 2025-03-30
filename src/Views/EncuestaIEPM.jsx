@@ -14,8 +14,6 @@ const IepmSurvey = () => {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [iepmResult, setIepmResult] = useState(null);
-  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
     if (!idEmprendedor) {
@@ -63,27 +61,6 @@ const IepmSurvey = () => {
     }
   };
 
-  const getIepmResult = async () => {
-    try {
-      const response = await fetch(`https://localhost:7075/api/IepmCalculation/LastResult/${idEmprendedor}`);
-      
-      // Manejo específico para 404 - no es un error en nuestro caso
-      if (response.status === 404) {
-        console.log("No se encontraron resultados previos del IEPM");
-        return null;
-      }
-      
-      if (!response.ok) {
-        throw new Error("Error al obtener resultados del IEPM");
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error("Error al obtener resultado IEPM:", error);
-      return null;
-    }
-  };
-
   const handleAnswerChange = (questionId, value) => {
     setAnswers(prev => ({
       ...prev,
@@ -104,10 +81,10 @@ const IepmSurvey = () => {
     }
 
     return Object.entries(answers).map(([idPregunta, valor]) => ({
-      IdPregunta: parseInt(idPregunta),
-      Valor: valor,
-      Comentarios: comments[idPregunta] || null,
-      IdEmprendedor: parseInt(idEmprendedor, 10)
+      idPregunta: parseInt(idPregunta),
+      valor: valor,
+      comentarios: comments[idPregunta] || null,
+      idEmprendedor: parseInt(idEmprendedor, 10)
     }));
   };
 
@@ -123,7 +100,6 @@ const IepmSurvey = () => {
       const payload = preparePayload();
       console.log("Enviando payload:", payload);
 
-      // 1. Enviar las respuestas
       const response = await fetch("https://localhost:7075/api/RespuestasIepm", {
         method: "POST",
         headers: {
@@ -137,14 +113,9 @@ const IepmSurvey = () => {
         throw new Error(errorData?.message || `Error HTTP: ${response.status}`);
       }
 
-      // 2. Intentar obtener resultados (maneja silenciosamente el 404)
-      const result = await getIepmResult();
-      setIepmResult(result);
-      
       setSubmitSuccess(true);
-      setShowResults(true);
     } catch (error) {
-      console.error("Error en el proceso:", error);
+      console.error("Error al enviar respuestas:", error);
       setError(error.message);
     } finally {
       setIsSubmitting(false);
@@ -181,40 +152,11 @@ const IepmSurvey = () => {
     navigate("/ventanaencuestas");
   };
 
-  if (submitSuccess && showResults) {
+  if (submitSuccess) {
     return (
       <div className="survey-box success-message">
         <h2>¡Encuesta completada con éxito!</h2>
-        <p>Gracias por participar en la encuesta.</p>
-        
-        {iepmResult ? (
-          <div className="iepm-result">
-            <h3>Resultados del IEPM:</h3>
-            <p><strong>Puntaje Total:</strong> {iepmResult.puntajeTotal}</p>
-            <p><strong>Nivel de Madurez:</strong> {iepmResult.nivelMadurez}</p>
-            {iepmResult.fechaCalculo && (
-              <p><strong>Fecha de Cálculo:</strong> {new Date(iepmResult.fechaCalculo).toLocaleDateString()}</p>
-            )}
-            
-            {iepmResult.detalles && (
-              <div className="result-details">
-                <h4>Detalles por dimensión:</h4>
-                <ul>
-                  {Object.entries(iepmResult.detalles).map(([dimension, puntaje]) => (
-                    <li key={dimension}>
-                      <strong>{dimension}:</strong> {puntaje}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="iepm-result no-results">
-            <p>Esta es tu primera evaluación IEPM. Los resultados estarán disponibles para consulta una vez procesados.</p>
-          </div>
-        )}
-        
+        <p>Gracias por participar en la encuesta. Los resultados han sido procesados.</p>
         <button 
           onClick={handleReturnToSurveys}
           className="return-button"

@@ -9,7 +9,7 @@
 }
 
 .historico-main-content {
-  margin-left: 250px; /* Ajuste para el sidebar */
+  margin-left: 10px; /* Ajuste para el sidebar */
   padding: 2rem;
   flex: 1;
 }
