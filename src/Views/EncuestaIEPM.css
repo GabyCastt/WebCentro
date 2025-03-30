@@ -1,13 +1,23 @@
 .survey-box {
     max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+    margin: 10px auto;
+    padding: 30px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   }
-  
+  .survy-type{
+    font-size: 26px;
+    font-weight: bold;
+    color: #c62828;
+    text-align: center;
+    margin-bottom: 1px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  }
   .success-message {
     text-align: center;
     color: #2e7d32;
@@ -30,7 +40,7 @@
   
   .destinatario-header {
     color: #333;
-    border-bottom: 2px solid #2196f3;
+    border-bottom: 2px solid #140E4E;
     padding-bottom: 10px;
     margin-bottom: 20px;
   }

@@ -412,9 +412,6 @@ function RegistroEmp() {
             </button>
           </div>
         </form>
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          Regresar
-        </button>
       </main>
     </div>
   );

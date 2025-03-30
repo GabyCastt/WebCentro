@@ -1,59 +1,82 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import menuBackground from "./side2.jpg";
 import { useAuthContext } from "../../context/AuthContext";
+
 const Menu = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { setUser } = useAuthContext(); // Accede a setUser desde el contexto
-  const navigate = useNavigate(); // Inicializa useNavigate
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isOpen, setIsOpen] = useState(true);
+  const { setUser } = useAuthContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      // En desktop, forzar que siempre esté abierto
+      if (window.innerWidth >= 768) {
+        setIsOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    if (isMobile) {
+      setIsOpen(!isOpen);
+    }
   };
 
-  const handleInicioClick = () => {
-    navigate("/home"); // Redirige a la página principal (App.jsx)
-  };
-
-  const handleHistoricoClick = () => {
-    navigate("/historico"); // Redirige a la ruta /historico
-  };
-
-  const handleRegistroClick = () => {
-    navigate("/registroemp"); // Redirige a la ruta /registroemp
-  };
-
+  const handleInicioClick = () => navigate("/home");
+  const handleHistoricoClick = () => navigate("/historico");
+  const handleRegistroClick = () => navigate("/registroemp");
+  const handleReporteriaClick = () => navigate("/reporteriarol");
   const handleLogout = () => {
-    setUser(null); // Elimina el usuario del estado global
-    navigate("/login"); // Redirige al login después de hacer logout
+    setUser(null);
+    navigate("/login");
   };
 
   return (
     <>
-      {/* Botón de toggle siempre visible */}
-      <button className="menu-toggle" onClick={toggleMenu}>
-        ☰
-      </button>
+      {/* Botón solo visible en móvil */}
+      {isMobile && (
+        <button className="menu-toggle" onClick={toggleMenu}>
+          {isOpen ? "✕" : "☰"}
+        </button>
+      )}
 
-      {/* Menú que se abre/cierra */}
-      <nav
-        className={`menu ${isOpen ? "open" : ""}`}
-        style={{ backgroundImage: `url(${menuBackground})` }}
-      >
-        <button className="menu-button" onClick={handleInicioClick}>
-          INICIO
-        </button>
-        <button className="menu-button" onClick={handleHistoricoClick}>
-          HISTÓRICO EMPRENDEDORES
-        </button>
-        <button className="menu-button" onClick={handleRegistroClick}>
-          NUEVO REGISTRO EMPRENDEDOR
-        </button>
-        <button className="menu-button" onClick={handleLogout}>
-          SALIR
-        </button>
-      </nav>
+      {/* Sidebar */}
+      <div className={`sidebar-container ${isOpen ? 'open' : ''} ${isMobile ? 'mobile' : 'desktop'}`}>
+        <nav
+          className="menu"
+          style={{ backgroundImage: `url(${menuBackground})` }}
+        >
+          <div className="menu-buttons-container"> {/* Nuevo contenedor */}
+            <button className="menu-button" onClick={handleInicioClick}>
+              INICIO
+            </button>
+            <button className="menu-button" onClick={handleHistoricoClick}>
+              HISTÓRICO EMPRENDEDORES
+            </button>
+            <button className="menu-button" onClick={handleRegistroClick}>
+              NUEVO REGISTRO EMPRENDEDOR
+            </button>
+            <button className="menu-button" onClick={handleReporteriaClick}>
+              REPORTERÍA
+            </button>
+            <button className="menu-button" onClick={handleLogout}>
+              SALIR
+            </button>
+          </div>
+        </nav>
+      </div>
+      
+      {/* Overlay solo en móvil */}
+      {isMobile && isOpen && (
+        <div className="menu-overlay" onClick={toggleMenu} />
+      )}
     </>
   );
 };

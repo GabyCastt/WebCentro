@@ -39,6 +39,9 @@
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .ven-option:hover {
@@ -81,6 +84,7 @@
 .ven-back-button {
   display: flex;
   align-items: center;
+  justify-content: right;
   background-color: #3D0301;
   color: #ffffff;
   border: none;
@@ -90,6 +94,9 @@
   font-size: 14px;
   margin-bottom: 20px;
   transition: all 0.3s ease;
+  align-self: flex-end; /* Alinea el botón al final del contenedor flex */
+  margin-left: auto; /* Empuja el botón hacia la derecha */
+  margin-top: 10px;
 }
 
 .ven-back-button:hover {
@@ -100,4 +107,69 @@
 .ven-back-icon {
   margin-right: 8px;
   font-size: 12px;
+}
+/* Estilos para el modal */
+.ven-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ven-modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ven-modal h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.ven-modal p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.ven-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.ven-modal-cancel {
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ven-modal-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+.ven-modal-confirm {
+  padding: 0.5rem 1rem;
+  background-color: #9e1b32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ven-modal-confirm:hover {
+  background-color: #470310;
 }

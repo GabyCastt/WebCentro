@@ -15,6 +15,7 @@ import VentanaEncuestas from "./Views/VentanaEncuestas.jsx";
 import RegistrarRol from "./Views/RegistrarRol";
 import Resultados from "./Views/Resultados";
 import Home from "./Views/Home";
+import ReporteriaRol from "./Views/ReporteriaRol.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -31,7 +32,6 @@ function App() {
               </Link>
             </div>
           )}
-
           <Routes>
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/RegistrarRol" element={<RegistrarRol setUser={setUser} />} />
@@ -51,7 +51,8 @@ function App() {
               <Route path="/resultados" element={<Resultados />} />
               <Route path="/registroemp" element={<RegistroEmp />} />
               <Route path="/emprendedor/:idEmprendedor" element={<DetallesEmp />} />
-              <Route path="/ventanaencuestas" element={<VentanaEncuestas />} /> </Route>
+              <Route path="/ventanaencuestas" element={<VentanaEncuestas />} />
+              <Route path="/reporteriarol" element={<ReporteriaRol />} /> </Route>
           </Routes>
         </div>
       </Router>

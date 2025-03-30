@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
@@ -7,6 +7,8 @@ import "./VentanaEncuestas.css";
 const VentanaEncuestas = () => {
   const navigate = useNavigate();
   const { idEmprendedor } = useParams();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSurvey, setSelectedSurvey] = useState(null);
 
   // Verificación adicional del ID
   if (!idEmprendedor) {
@@ -16,7 +18,9 @@ const VentanaEncuestas = () => {
         <div className="ven-layout">
           <Sidebar />
           <div className="ven-selection">
-            <h2 className="ven-title">Los resultados aún no están disponibles.</h2>
+            <h2 className="ven-title">
+              Los resultados aún no están disponibles.
+            </h2>
             <button onClick={() => navigate(-2)} className="ven-back-button">
               Regresar
             </button>
@@ -26,12 +30,18 @@ const VentanaEncuestas = () => {
     );
   }
 
-  const goToIceSurvey = () => {
-    navigate(`/detalles/${idEmprendedor}/encuestaice`);
+  const handleSurveySelection = (surveyType) => {
+    setSelectedSurvey(surveyType);
+    setShowModal(true);
   };
 
-  const goToIepmSurvey = () => {
-    navigate(`/detalles/${idEmprendedor}/encuestaiepm`);
+  const proceedToSurvey = () => {
+    setShowModal(false);
+    if (selectedSurvey === "ice") {
+      navigate(`/detalles/${idEmprendedor}/encuestaice`);
+    } else if (selectedSurvey === "iepm") {
+      navigate(`/detalles/${idEmprendedor}/encuestaiepm`);
+    }
   };
 
   const goToResults = async () => {
@@ -53,9 +63,7 @@ const VentanaEncuestas = () => {
           setTimeout(checkResults, 1000);
         } else {
           const errorData = await response.json().catch(() => ({}));
-          alert(
-            errorData.title || "Los resultados aún no están disponibles."
-          );
+          alert(errorData.title || "Los resultados aún no están disponibles.");
         }
       } catch (error) {
         console.error("Error de red:", error);
@@ -74,7 +82,6 @@ const VentanaEncuestas = () => {
   const goBack = () => {
     navigate(-1);
   };
-
   return (
     <div className="ven-container">
       <Header />
@@ -89,7 +96,10 @@ const VentanaEncuestas = () => {
               La encuesta ICE mide las competencias emprendedoras en distintos
               ámbitos.
             </p>
-            <button onClick={goToIceSurvey} className="ven-option-button">
+            <button
+              onClick={() => handleSurveySelection("ice")}
+              className="ven-option-button"
+            >
               Ir a Encuesta ICE
             </button>
           </div>
@@ -99,7 +109,10 @@ const VentanaEncuestas = () => {
             <p className="ven-option-description">
               Evalúa factores motivacionales y de resiliencia.
             </p>
-            <button onClick={goToIepmSurvey} className="ven-option-button">
+            <button
+              onClick={() => handleSurveySelection("iepm")}
+              className="ven-option-button"
+            >
               Ir a Encuesta IEPM
             </button>
           </div>
@@ -118,6 +131,33 @@ const VentanaEncuestas = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación */}
+      {showModal && (
+        <div className="ven-modal-overlay">
+          <div className="ven-modal">
+            <h3>Confirmación</h3>
+            <p>
+              ¿Estás seguro que deseas comenzar la encuesta{" "}
+              {selectedSurvey === "ice" ? "ICE" : "IEPM"}?
+            </p>
+            <p>
+              Una vez iniciada, deberás completarla para obtener resultados.
+            </p>
+            <div className="ven-modal-buttons">
+              <button
+                onClick={() => setShowModal(false)}
+                className="ven-modal-cancel"
+              >
+                Cancelar
+              </button>
+              <button onClick={proceedToSurvey} className="ven-modal-confirm">
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

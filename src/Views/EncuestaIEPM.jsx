@@ -221,7 +221,10 @@ const IepmSurvey = () => {
       </p>
 
       <h2 className="destinatario-header">
-        Preguntas para: <strong>{currentDestinatario}</strong>
+      <p className="survy-type">
+        ENCUESTA
+      </p>
+        Enfoque: <strong>{currentDestinatario}</strong>
       </h2>
 
       {showUnansweredAlert && (
@@ -232,7 +235,7 @@ const IepmSurvey = () => {
       )}
 
       <div className="progress-indicator">
-        Destinatario {currentIndex + 1} de {destinatarios.length}
+        Sección: {currentIndex + 1} de {destinatarios.length}
       </div>
 
       <div className="questions-container">
@@ -281,7 +284,7 @@ const IepmSurvey = () => {
             onClick={() => setCurrentDestinatario(destinatarios[currentIndex - 1])}
             className="prev-button"
           >
-            Anterior destinatario
+            Anterior sección
           </button>
         )}
 

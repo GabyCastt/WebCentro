@@ -1,41 +1,50 @@
 /* Estructura principal */
 .app-container {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .home-content {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  /* Encabezado Institucional */
-  .institutional-header {
-    background-color: #140E4E;
-    color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    margin-bottom: 3rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .logo-title-container {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
-  
-  .institutional-logo {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    border-radius: 50%;
-    border: 3px solid white;
-  }
+  display: flex;
+  min-height: 250vh;
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-left: 200px; 
+  transition: margin-left 0.3s ease;
+  width: calc(100% - 200px);
+}
+
+/* Cuando el sidebar está cerrado (solo para móvil) */
+.sidebar-closed .app-container {
+  margin-left: 0;
+  width: 100%;
+}
+
+.home-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto; 
+}
+
+/* Encabezado Institucional */
+.institutional-header {
+  background-color: #140E4E;
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo-title-container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.institutional-logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 3px solid white;
+}
   
   .institutional-title {
     font-size: 2rem;
@@ -134,23 +143,25 @@
   }
   
   /* Responsive */
-  @media (max-width: 768px) {
-    .app-container {
+@media (max-width: 768px) {
+  .app-container {
       flex-direction: column;
-    }
-    
-    .logo-title-container {
+      margin-left: 0;
+      width: 100%;
+  }
+  
+  .logo-title-container {
       flex-direction: column;
       text-align: center;
       gap: 1rem;
-    }
-    
-    .institutional-logo {
+  }
+  
+  .institutional-logo {
       width: 80px;
       height: 80px;
-    }
-    
-    .founders-grid {
-      grid-template-columns: 1fr;
-    }
   }
+  
+  .founders-grid {
+      grid-template-columns: 1fr;
+  }
+}
