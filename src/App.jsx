@@ -27,7 +27,7 @@ function App() {
           {!user && (
             <div className="login-button-container">
               <Link to="/login">
-                <button>Login</button>
+              <button className="login-btn">Login</button>
               </Link>
             </div>
           )}
@@ -44,6 +44,7 @@ function App() {
               <Route path="/detalles/:idEmprendedor" element={<DetallesEmp />} />
               <Route path="/detalles/:idEmprendedor/ventanaencuestas" element={<VentanaEncuestas />} />
               <Route path="/detalles/:idEmprendedor/encuestaice" element={<EncuestaICE />}/>
+              <Route path="/detalles/:idEmprendedor/encuestaiepm" element={<EncuestaIEPM />}/>
               <Route path="/detalles/:idEmprendedor/resultados" element={<Resultados />}/>
               <Route path="/encuestaice" element={<EncuestaICE />} />
               <Route path="/encuestaiepm" element={<EncuestaIEPM />} />

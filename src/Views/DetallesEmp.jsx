@@ -298,7 +298,6 @@ useEffect(() => {
           <button className="emprendedor-action-btn emprendedor-edit-btn" onClick={isEditing ? handleSaveClick : handleEditClick}>
             {isEditing ? "Guardar Cambios" : "Editar Información"}
           </button>
-          <button className="emprendedor-action-btn emprendedor-report-btn">Generar Reporte PDF</button>
           <button className="emprendedor-action-btn emprendedor-survey-btn" onClick={handleEncuestasClick}>Ver Encuestas</button>
           <button className="emprendedor-action-btn emprendedor-back-btn" onClick={() => navigate(-1)}>Volver al Listado</button>
         </div>

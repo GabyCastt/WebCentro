@@ -17,20 +17,20 @@ const EncuestaICE = () => {
   }, []);
 
   useEffect(() => {
-    // Scroll al inicio cuando cambia la competencia
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentCompetenciaIndex]);
 
   const fetchQuestionsAndCompetencias = async () => {
     try {
-      const preguntasResponse = await fetch(
-        "https://localhost:7075/api/PreguntasIce"
-      );
-      const preguntasData = await preguntasResponse.json();
-      const competenciasResponse = await fetch(
-        "https://localhost:7075/api/Competencia"
-      );
-      const competenciasData = await competenciasResponse.json();
+      const [preguntasResponse, competenciasResponse] = await Promise.all([
+        fetch("https://localhost:7075/api/PreguntasIce"),
+        fetch("https://localhost:7075/api/Competencia")
+      ]);
+
+      const [preguntasData, competenciasData] = await Promise.all([
+        preguntasResponse.json(),
+        competenciasResponse.json()
+      ]);
 
       const grouped = preguntasData.reduce((acc, question) => {
         const compId = question.idCompetencia;
@@ -51,7 +51,7 @@ const EncuestaICE = () => {
   };
 
   const handleAnswer = (questionId, value) => {
-    setAnswers({ ...answers, [questionId]: value });
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
   const handleNextCompetencia = () => {
@@ -59,7 +59,7 @@ const EncuestaICE = () => {
     const currentQuestions = groupedQuestions[currentCompetenciaId] || [];
 
     const allAnswered = currentQuestions.every(
-      (q) => answers[q.idPregunta] !== undefined
+      q => answers[q.idPregunta] !== undefined
     );
 
     if (!allAnswered) {
@@ -68,13 +68,13 @@ const EncuestaICE = () => {
     }
 
     if (currentCompetenciaIndex < competenciasIds.length - 1) {
-      setCurrentCompetenciaIndex(currentCompetenciaIndex + 1);
+      setCurrentCompetenciaIndex(prev => prev + 1);
     }
   };
 
   const handlePreviousCompetencia = () => {
     if (currentCompetenciaIndex > 0) {
-      setCurrentCompetenciaIndex(currentCompetenciaIndex - 1);
+      setCurrentCompetenciaIndex(prev => prev - 1);
     }
   };
 
@@ -84,25 +84,25 @@ const EncuestaICE = () => {
       return;
     }
 
-    const respuestasFormateadas = Object.keys(answers).map((idPregunta) => ({
-      idRespuesta: 0,
-      idPregunta: parseInt(idPregunta, 10),
-      valorRespuesta: answers[idPregunta],
-      idEncuesta: 0,
-      idEmprendedor: idEmprendedor,
-      idEmprendedorNavigation: null,
-      idPreguntaNavigation: null,
-    }));
+    // Nueva estructura de datos para el backend
+    const requestData = {
+      emprendedorId: parseInt(idEmprendedor, 10),
+      respuestas: Object.keys(answers).map(idPregunta => ({
+        idEmprendedor: parseInt(idEmprendedor, 10),
+        valorRespuesta: answers[idPregunta],
+        idPregunta: parseInt(idPregunta, 10)
+      }))
+    };
 
     try {
       const response = await fetch(
-        `https://localhost:7075/api/EncuestasIce/procesar-encuesta?emprendedorId=${idEmprendedor}`,
+        `https://localhost:7075/api/EncuestasIce/procesar-encuesta`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(respuestasFormateadas),
+          body: JSON.stringify(requestData),
         }
       );
 
@@ -120,29 +120,28 @@ const EncuestaICE = () => {
   };
 
   const handleFinalizarEncuesta = () => {
-    const allQuestionsAnswered = competenciasIds.every((compId) => {
+    const allQuestionsAnswered = competenciasIds.every(compId => {
       const questions = groupedQuestions[compId] || [];
-      return questions.every((q) => answers[q.idPregunta] !== undefined);
+      return questions.every(q => answers[q.idPregunta] !== undefined);
     });
 
     if (!allQuestionsAnswered) {
-      alert(
-        "Por favor, responde todas las preguntas antes de finalizar la encuesta."
-      );
+      alert("Por favor, responde todas las preguntas antes de finalizar la encuesta.");
       return;
     }
 
-    enviarRespuestas();
+    if (window.confirm("¿Estás seguro de que deseas finalizar la encuesta?")) {
+      enviarRespuestas();
+    }
   };
 
   const competenciasIds = Object.keys(groupedQuestions).sort((a, b) => a - b);
   const currentCompetenciaId = competenciasIds[currentCompetenciaIndex];
   const currentQuestions = groupedQuestions[currentCompetenciaId] || [];
-  const isLastCompetencia =
-    currentCompetenciaIndex === competenciasIds.length - 1;
+  const isLastCompetencia = currentCompetenciaIndex === competenciasIds.length - 1;
   const isFirstCompetencia = currentCompetenciaIndex === 0;
   const currentCompetencia = competencias.find(
-    (c) => c.idCompetencia === parseInt(currentCompetenciaId, 10)
+    c => c.idCompetencia === parseInt(currentCompetenciaId, 10)
   );
 
   const getScale = (competenciaId) => {
@@ -189,7 +188,7 @@ const EncuestaICE = () => {
             {idx + 1}. {q.textoPregunta}
           </p>
           <div className="ice-answers-container">
-            {getScale(currentCompetenciaId).map((num) => (
+            {getScale(currentCompetenciaId).map(num => (
               <div key={num} className="ice-answer-wrapper">
                 <div
                   onClick={() => handleAnswer(q.idPregunta, num)}

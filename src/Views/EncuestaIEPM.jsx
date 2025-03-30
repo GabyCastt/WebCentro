@@ -1,44 +1,253 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import "./EncuestaIEPM.css";
 
-const dimensionesMap = {
-  1: "Evaluación de la puesta en marcha",
-};
-
-const IepmSurvey = ({ onComplete }) => {
+const IepmSurvey = () => {
+  const { idEmprendedor } = useParams();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [groupedQuestions, setGroupedQuestions] = useState({});
+  const [currentDestinatario, setCurrentDestinatario] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [comments, setComments] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [iepmResult, setIepmResult] = useState(null);
+  const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
+    if (!idEmprendedor) {
+      setError("No se ha proporcionado un ID de emprendedor válido");
+      setIsLoading(false);
+      return;
+    }
     fetchQuestions();
-  }, []);
+  }, [idEmprendedor]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentDestinatario]);
+
+  useEffect(() => {
+    if (questions.length > 0) {
+      const grouped = questions.reduce((acc, question) => {
+        if (!acc[question.destinatario]) {
+          acc[question.destinatario] = [];
+        }
+        acc[question.destinatario].push(question);
+        return acc;
+      }, {});
+
+      setGroupedQuestions(grouped);
+      setCurrentDestinatario(Object.keys(grouped)[0]);
+    }
+  }, [questions]);
 
   const fetchQuestions = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch("https://localhost:7075/api/PreguntasIepm");
+      const response = await fetch("https://localhost:7075/api/PreguntasIepm/detailed");
+      if (!response.ok) {
+        throw new Error("Error al obtener las preguntas");
+      }
       const data = await response.json();
       setQuestions(data);
     } catch (error) {
       console.error("Error al obtener preguntas:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getCategoryName = (id) => {
-    return dimensionesMap[id] || "Dimensión Desconocida";
+  const getIepmResult = async () => {
+    try {
+      const response = await fetch(`https://localhost:7075/api/IepmCalculation/LastResult/${idEmprendedor}`);
+      
+      // Manejo específico para 404 - no es un error en nuestro caso
+      if (response.status === 404) {
+        console.log("No se encontraron resultados previos del IEPM");
+        return null;
+      }
+      
+      if (!response.ok) {
+        throw new Error("Error al obtener resultados del IEPM");
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error al obtener resultado IEPM:", error);
+      return null;
+    }
   };
 
-  const handleNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+  const handleAnswerChange = (questionId, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+
+  const handleCommentChange = (questionId, comment) => {
+    setComments(prev => ({
+      ...prev,
+      [questionId]: comment
+    }));
+  };
+
+  const preparePayload = () => {
+    if (!idEmprendedor) {
+      throw new Error("idEmprendedor es requerido");
+    }
+
+    return Object.entries(answers).map(([idPregunta, valor]) => ({
+      IdPregunta: parseInt(idPregunta),
+      Valor: valor,
+      Comentarios: comments[idPregunta] || null,
+      IdEmprendedor: parseInt(idEmprendedor, 10)
+    }));
+  };
+
+  const submitAnswers = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      if (!idEmprendedor) {
+        throw new Error("No se ha proporcionado un ID de emprendedor válido");
+      }
+
+      const payload = preparePayload();
+      console.log("Enviando payload:", payload);
+
+      // 1. Enviar las respuestas
+      const response = await fetch("https://localhost:7075/api/RespuestasIepm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Error HTTP: ${response.status}`);
+      }
+
+      // 2. Intentar obtener resultados (maneja silenciosamente el 404)
+      const result = await getIepmResult();
+      setIepmResult(result);
+      
+      setSubmitSuccess(true);
+      setShowResults(true);
+    } catch (error) {
+      console.error("Error en el proceso:", error);
+      setError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleNextDestinatario = () => {
+    const destinatarios = Object.keys(groupedQuestions);
+    const currentIndex = destinatarios.indexOf(currentDestinatario);
+    
+    if (currentIndex < destinatarios.length - 1) {
+      setCurrentDestinatario(destinatarios[currentIndex + 1]);
     } else {
-      onComplete();
+      handleSubmit();
     }
   };
 
-  const handleAnswerClick = (value) => {
-    setSelectedAnswer(value);
+  const handleSubmit = async () => {
+    const unansweredQuestions = questions.filter(q => answers[q.idPregunta] === undefined);
+    
+    if (unansweredQuestions.length > 0) {
+      alert(`Por favor responda todas las preguntas antes de finalizar. Faltan ${unansweredQuestions.length} preguntas.`);
+      return;
+    }
+    
+    try {
+      await submitAnswers();
+    } catch (error) {
+      // El error ya está manejado en submitAnswers
+    }
   };
+
+  const handleReturnToSurveys = () => {
+    navigate("/ventanaencuestas");
+  };
+
+  if (submitSuccess && showResults) {
+    return (
+      <div className="survey-box success-message">
+        <h2>¡Encuesta completada con éxito!</h2>
+        <p>Gracias por participar en la encuesta.</p>
+        
+        {iepmResult ? (
+          <div className="iepm-result">
+            <h3>Resultados del IEPM:</h3>
+            <p><strong>Puntaje Total:</strong> {iepmResult.puntajeTotal}</p>
+            <p><strong>Nivel de Madurez:</strong> {iepmResult.nivelMadurez}</p>
+            {iepmResult.fechaCalculo && (
+              <p><strong>Fecha de Cálculo:</strong> {new Date(iepmResult.fechaCalculo).toLocaleDateString()}</p>
+            )}
+            
+            {iepmResult.detalles && (
+              <div className="result-details">
+                <h4>Detalles por dimensión:</h4>
+                <ul>
+                  {Object.entries(iepmResult.detalles).map(([dimension, puntaje]) => (
+                    <li key={dimension}>
+                      <strong>{dimension}:</strong> {puntaje}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="iepm-result no-results">
+            <p>Esta es tu primera evaluación IEPM. Los resultados estarán disponibles para consulta una vez procesados.</p>
+          </div>
+        )}
+        
+        <button 
+          onClick={handleReturnToSurveys}
+          className="return-button"
+        >
+          Volver a Encuestas
+        </button>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return <div className="survey-box">Cargando preguntas...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="survey-box error-message">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => window.location.reload()}>Reintentar</button>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return <div className="survey-box">No hay preguntas disponibles</div>;
+  }
+
+  if (!currentDestinatario) {
+    return <div className="survey-box">No hay destinatarios definidos</div>;
+  }
+
+  const currentQuestions = groupedQuestions[currentDestinatario];
 
   return (
     <div className="survey-box">
@@ -46,32 +255,60 @@ const IepmSurvey = ({ onComplete }) => {
         Tipo de encuesta: <strong>IEPM</strong>
       </p>
 
-      <p className="category-label">
-        Dimensión: <strong>{getCategoryName(questions[currentIndex]?.idDimension)}</strong>
-      </p>
+      <h2 className="destinatario-header">
+        Preguntas para: <strong>{currentDestinatario}</strong>
+      </h2>
 
-      <p className="question-number">
-        Pregunta {currentIndex + 1} de {questions.length}
-      </p>
+      <div className="questions-container">
+        {currentQuestions.map((question) => (
+          <div key={question.idPregunta} className="question-container">
+            <p className="question-text">
+              {question.enunciado}
+            </p>
+            
+            <p className="question-indicator">
+              <small>Indicador: {question.indicador}</small>
+            </p>
 
-      <p className="question-text">
-        {questions[currentIndex]?.textoPregunta || "Cargando pregunta..."}
-      </p>
+            <div className="answers-container">
+              {question.criteriosEvaluacion.map((criterio) => (
+                <div
+                  key={criterio.idCriterio}
+                  onClick={() => handleAnswerChange(question.idPregunta, criterio.valor)}
+                  className={`answer-option ${
+                    answers[question.idPregunta] === criterio.valor ? "selected" : ""
+                  }`}
+                >
+                  <div className="answer-value">{criterio.valor}</div>
+                  <div className="answer-description">{criterio.descripcion}</div>
+                </div>
+              ))}
+            </div>
 
-      <div className="answers-container">
-        {[1, 2, 3, 4, 5].map((num) => (
-          <div
-            key={num}
-            onClick={() => handleAnswerClick(num)}
-            className={`answer-circle ${selectedAnswer === num ? "selected" : ""}`}
-          >
-            <span className="answer-label">{num}</span>
+            <div className="comment-section">
+              <label htmlFor={`comment-${question.idPregunta}`}>Comentarios (opcional):</label>
+              <textarea
+                id={`comment-${question.idPregunta}`}
+                className="comment-input"
+                value={comments[question.idPregunta] || ""}
+                onChange={(e) => handleCommentChange(question.idPregunta, e.target.value)}
+                placeholder="Agregue algún comentario si lo desea"
+              />
+            </div>
           </div>
         ))}
       </div>
 
-      <button onClick={handleNext} className="next-button">
-        {currentIndex < questions.length - 1 ? "Siguiente" : "Finalizar"}
+      <button 
+        onClick={handleNextDestinatario} 
+        className="next-button"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Procesando..." : 
+          Object.keys(groupedQuestions).indexOf(currentDestinatario) < 
+          Object.keys(groupedQuestions).length - 1 
+          ? "Siguiente destinatario" 
+          : "Finalizar encuesta"}
       </button>
     </div>
   );

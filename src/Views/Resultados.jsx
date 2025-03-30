@@ -1,90 +1,181 @@
 import React, { useState, useEffect } from "react";
-import "./Resultados.css";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header/Header";
 import Sidebar from "../components/Side-bar/Sidebar";
-import { useParams } from "react-router-dom";
+import "./Resultados.css";
 
 const Resultados = () => {
   const { idEmprendedor } = useParams();
   const [resultados, setResultados] = useState([]);
   const [emprendedor, setEmprendedor] = useState(null);
-  const [loading, setLoading] = useState(true);
-useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  // Obtener los resultados de la API y los datos del emprendedor
+  const [encuestas, setEncuestas] = useState([]);
+  const [encuestaSeleccionada, setEncuestaSeleccionada] = useState(null);
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const [status, setStatus] = useState({
+    loading: true,
+    error: null,
+    loadedEncuestas: false,
+    loadedResultados: false,
+  });
+  const [iepmData, setIepmData] = useState(null);
+  const [showIEPM, setShowIEPM] = useState(false);
+
+  // Efecto para cargar las encuestas disponibles
+  useEffect(() => {
+    const fetchEncuestas = async () => {
+      try {
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
+
+        const response = await fetch(
+          `https://localhost:7075/api/Encuesta/encuestas/${idEmprendedor}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+
+        // Adaptamos el formato [1, 2] a objetos con idEncuesta
+        const encuestasFormateadas = Array.isArray(data)
+          ? data.map((id) => ({ idEncuesta: id }))
+          : [];
+
+        setEncuestas(encuestasFormateadas);
+        setStatus((prev) => ({ ...prev, loadedEncuestas: true }));
+
+        if (encuestasFormateadas.length > 0) {
+          setEncuestaSeleccionada(encuestasFormateadas[0].idEncuesta);
+        } else {
+          setStatus((prev) => ({ ...prev, loading: false }));
+        }
+      } catch (err) {
+        console.error("Error al cargar encuestas:", err);
+        setStatus((prev) => ({
+          ...prev,
+          loading: false,
+          error: `Error al cargar encuestas: ${err.message}`,
+        }));
+      }
+    };
+
+    fetchEncuestas();
+  }, [idEmprendedor]);
+
+  // Efecto para cargar resultados cuando se selecciona una encuesta
   useEffect(() => {
     const fetchData = async () => {
+      if (!encuestaSeleccionada) return;
+
       try {
-        // Obtener resultados de la encuesta ICE
-        const resultadosResponse = await fetch(
-          `https://localhost:7075/api/ResultadosIce`
-        );
-        if (!resultadosResponse.ok) {
-          throw new Error("Error al obtener los resultados");
-        }
-        const resultadosData = await resultadosResponse.json();
-        const resultadosFiltrados = resultadosData.filter(
-          (resultado) => resultado.idEmprendedor === parseInt(idEmprendedor, 10)
-        );
-        setResultados(resultadosFiltrados);
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         // Obtener datos del emprendedor
-        const emprendedorResponse = await fetch(
+        const emprendedorRes = await fetch(
           `https://localhost:7075/api/Emprendedores/${idEmprendedor}`
         );
-        if (!emprendedorResponse.ok) {
-          throw new Error("Error al obtener los datos del emprendedor");
-        }
-        const emprendedorData = await emprendedorResponse.json();
-        setEmprendedor(emprendedorData);
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Hubo un error al cargar los datos.");
-      } finally {
-        setLoading(false);
+        if (!emprendedorRes.ok) throw new Error("Error al cargar emprendedor");
+        setEmprendedor(await emprendedorRes.json());
+
+        // Obtener resultados de la encuesta seleccionada
+        const resultadosRes = await fetch(
+          `https://localhost:7075/api/Encuesta/resultados-resumen/${idEmprendedor}/${encuestaSeleccionada}`
+        );
+        if (!resultadosRes.ok) throw new Error("Error al cargar resultados");
+
+        const resultadosData = await resultadosRes.json();
+
+        // Asegurarnos de que siempre trabajamos con un array
+        const resultadosArray = Array.isArray(resultadosData)
+          ? resultadosData
+          : resultadosData.resultados || resultadosData.data || [];
+
+        setResultados(resultadosArray);
+        setStatus((prev) => ({
+          ...prev,
+          loading: false,
+          loadedResultados: true,
+          error: null,
+        }));
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        setStatus((prev) => ({
+          ...prev,
+          loading: false,
+          error: `Error al cargar datos: ${err.message}`,
+        }));
       }
     };
 
     fetchData();
-  }, [idEmprendedor]);
+  }, [idEmprendedor, encuestaSeleccionada]);
+
+  // Función para cargar los resultados IEPM
+  const fetchIEPMData = async () => {
+    try {
+      setStatus((prev) => ({ ...prev, loading: true, error: null }));
+
+      const response = await fetch(
+        `https://localhost:7075/api/PreguntasIepm/ResultadosCompletos/${idEmprendedor}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      setIepmData(data);
+      setShowIEPM(true);
+      setStatus((prev) => ({ ...prev, loading: false }));
+    } catch (error) {
+      console.error("Error al cargar resultados IEPM:", error);
+      setStatus((prev) => ({
+        ...prev,
+        loading: false,
+        error: `Error al cargar IEPM: ${error.message}`,
+      }));
+    }
+  };
 
   // Función para obtener el valor de una competencia específica
   const getValorCompetencia = (idCompetencia) => {
+    if (!resultados || resultados.length === 0) return "N/A";
     const resultado = resultados.find((r) => r.idCompetencia === idCompetencia);
-    return resultado ? resultado.puntuacionCompetencia.toFixed(2) : "N/A";
+    return resultado
+      ? resultado.puntuacionCompetencia?.toFixed(2) || "0.00"
+      : "N/A";
   };
 
-  // Función para calcular el ICE General (suma de todas las competencias)
+  // Función para calcular el ICE General
   const calcularIceGeneral = () => {
+    if (!resultados || resultados.length === 0) return 0;
     const total = resultados.reduce(
-      (sum, r) => sum + r.puntuacionCompetencia,
+      (sum, r) => sum + (r.puntuacionCompetencia || 0),
       0
     );
-    return total.toFixed(2);
+    return total;
   };
 
-  // Función para determinar el nivel y acciones según el ICE General
+  // Función para determinar el nivel según el ICE General
   const getNivelIceGeneral = () => {
-    const iceGeneral = parseFloat(calcularIceGeneral());
+    const iceGeneral = calcularIceGeneral();
     if (iceGeneral >= 0 && iceGeneral < 0.6) {
       return {
         nivel: "Bajo",
-        valoracion:
-          "Baja competencia emprendedora, muy baja Mediana competencia",
+        valoracion: "Baja competencia emprendedora",
         acciones: "Falta desarrollar las competencias",
       };
     } else if (iceGeneral >= 0.6 && iceGeneral < 0.8) {
       return {
         nivel: "Medio",
-        valoracion: "Mediana competencia para Alta competencia",
-        acciones: "Se cumple con las competencias",
+        valoracion: "Mediana competencia",
+        acciones: "Se cumple con las competencias básicas",
       };
     } else if (iceGeneral >= 0.8 && iceGeneral <= 1) {
       return {
         nivel: "Alto",
         valoracion: "Alta competencia",
-        acciones: "Se cumple con las competencias",
+        acciones: "Excelente desempeño en competencias",
       };
     } else {
       return {
@@ -95,27 +186,73 @@ useEffect(() => {
     }
   };
 
-  // Función para calcular el IEPM (se debe ajustar a lo que necesitemos)
-  const calcularIepm = () => {
-    return "N/A"; // Placeholder
-  };
-  const [activeTooltip, setActiveTooltip] = useState(null);
+  if (status.error) {
+    return (
+      <div className="results-container">
+        <Header />
+        <div className="error-message">
+          <h3>Error</h3>
+          <p>{status.error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="reload-button"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  // Función para formatear la fecha actual
-  const getFechaActual = () => {
-    const fecha = new Date();
-    return fecha.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  if (status.loading) {
+    return (
+      <div className="results-container">
+        <Header />
+        <div className="loading">
+          <p>Cargando datos...</p>
+          <div className="spinner"></div>
+        </div>
+      </div>
+    );
+  }
 
-  if (loading) {
-    return <div className="loading">Cargando resultados...</div>;
+  if (encuestas.length === 0) {
+    return (
+      <div className="results-container">
+        <Header />
+        <div className="no-encuestas">
+          <h3>No hay encuestas disponibles</h3>
+          <p>Este emprendedor no tiene encuestas registradas.</p>
+        </div>
+      </div>
+    );
   }
 
   const iceGeneralInfo = getNivelIceGeneral();
+  const competenciasNombres = [
+    "Comportamiento Emprendedor",
+    "Creatividad",
+    "Liderazgo",
+    "Personalidad Proactiva",
+    "Tolerancia a la incertidumbre",
+    "Trabajo en Equipo",
+    "Pensamiento Estratégico",
+    "Proyección Social",
+    "Orientación Financiera",
+    "Orientación Tecnológica e innovación",
+  ];
+  const colors = [
+    "#FF6E6E",
+    "#D05AFF",
+    "#6A8CFF",
+    "#4DDBFF",
+    "#7CFFCB",
+    "#F4FF81",
+    "#FFE066",
+    "#FF9E66",
+    "#FF7BAC",
+    "#66FFA6",
+  ];
 
   return (
     <div className="results-container">
@@ -124,85 +261,53 @@ useEffect(() => {
         <Sidebar />
         <div className="results-box">
           <h2>RESULTADOS FINALES</h2>
+
+          {/* Selector de encuestas */}
+          <div className="encuesta-selector">
+            <label htmlFor="select-encuesta">Seleccione una encuesta: </label>
+            <select
+              id="select-encuesta"
+              value={encuestaSeleccionada || ""}
+              onChange={(e) =>
+                setEncuestaSeleccionada(parseInt(e.target.value))
+              }
+              disabled={status.loading}
+            >
+              {encuestas.map((encuesta) => (
+                <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
+                  Encuesta ID: {encuesta.idEncuesta}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Información del emprendedor */}
           <div className="results-info">
             <p>
               Emprendedor:{" "}
               <span className="data-box">
-                {emprendedor ? emprendedor.nombre : "Cargando..."}
+                {emprendedor ? emprendedor.nombre : "N/A"}
               </span>
             </p>
             <p>
-              Fecha: <span className="data-box">{getFechaActual()}</span>
+              Encuesta seleccionada:{" "}
+              <span className="data-box">{encuestaSeleccionada || "N/A"}</span>
             </p>
           </div>
-
+          {/* Resultados por dimensión */}
           <h3>CÁLCULO ICE POR DIMENSIÓN:</h3>
           <div className="ice-dimensions">
-            <p>
-              Comportamiento emprendedor →{" "}
-              <span className="data-box">{getValorCompetencia(1)}</span>
-            </p>
-            <p>
-              Creatividad →{" "}
-              <span className="data-box">{getValorCompetencia(2)}</span>
-            </p>
-            <p>
-              Liderazgo →{" "}
-              <span className="data-box">{getValorCompetencia(3)}</span>
-            </p>
-            <p>
-              Personalidad Proactiva →{" "}
-              <span className="data-box">{getValorCompetencia(4)}</span>
-            </p>
-            <p>
-              Tolerancia a la incertidumbre →{" "}
-              <span className="data-box">{getValorCompetencia(5)}</span>
-            </p>
-            <p>
-              Trabajo en Equipo →{" "}
-              <span className="data-box">{getValorCompetencia(6)}</span>
-            </p>
-            <p>
-              Pensamiento Estratégico →{" "}
-              <span className="data-box">{getValorCompetencia(7)}</span>
-            </p>
-            <p>
-              Proyección Social →{" "}
-              <span className="data-box">{getValorCompetencia(8)}</span>
-            </p>
-            <p>
-              Orientación Financiera →{" "}
-              <span className="data-box">{getValorCompetencia(9)}</span>
-            </p>
-            <p>
-              Orientación Tecnológica e Innovación →{" "}
-              <span className="data-box">{getValorCompetencia(10)}</span>
-            </p>
+            {competenciasNombres.map((nombre, index) => (
+              <p key={index}>
+                {nombre} →{" "}
+                <span className="data-box">
+                  {getValorCompetencia(index + 1)}
+                </span>
+              </p>
+            ))}
           </div>
 
-          <h3>RESULTADO GENERAL</h3>
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th>NIVEL</th>
-                <th>VALORACIÓN</th>
-                <th>ACCIONES</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>ICE General</td>
-                <td>{calcularIceGeneral()}</td>
-                <td>{iceGeneralInfo.acciones}</td>
-              </tr>
-              <tr>
-                <td>IEPM</td>
-                <td>{calcularIepm()}</td>
-                <td>-</td>
-              </tr>
-            </tbody>
-          </table>
-
+          {/* Gráfico de pastel */}
           <div className="pie-chart-container">
             <h4>VALORACIÓN ICE</h4>
             {activeTooltip && (
@@ -213,32 +318,6 @@ useEffect(() => {
             <div className="pie-chart-wrapper">
               <div className="pie-chart">
                 {resultados.map((resultado, index) => {
-                  const competencias = [
-                    "Comportamiento Emprendedor",
-                    "Creatividad",
-                    "Liderazgo",
-                    "Personalidad Proactiva",
-                    "Tolerancia a la incertidumbre",
-                    "Trabajo en Equipo",
-                    "Pensamiento Estratégico",
-                    "Proyección Social",
-                    "Orientación Financiera",
-                    "Orientación Tecnológica e innovación",
-                  ];
-
-                  const colors = [
-                    "#FF6E6E",
-                    "#D05AFF",
-                    "#6A8CFF",
-                    "#4DDBFF",
-                    "#7CFFCB",
-                    "#F4FF81",
-                    "#FFE066",
-                    "#FF9E66",
-                    "#FF7BAC",
-                    "#66FFA6",
-                  ];
-
                   const percentage =
                     (resultado.puntuacionCompetencia / calcularIceGeneral()) *
                     100;
@@ -260,8 +339,7 @@ useEffect(() => {
                       }}
                       onMouseEnter={() =>
                         setActiveTooltip({
-                          competencia:
-                            competencias[resultado.idCompetencia - 1],
+                          competencia: competenciasNombres[index],
                           percentage: percentage.toFixed(1),
                         })
                       }
@@ -273,32 +351,6 @@ useEffect(() => {
 
               <div className="pie-legend">
                 {resultados.map((resultado, index) => {
-                  const competencias = [
-                    "Comportamiento Emprendedor",
-                    "Creatividad",
-                    "Liderazgo",
-                    "Personalidad Proactiva",
-                    "Tolerancia a la incertidumbre",
-                    "Trabajo en Equipo",
-                    "Pensamiento Estratégico",
-                    "Proyección Social",
-                    "Orientación Financiera",
-                    "Orientación Tecnológica e innovación",
-                  ];
-
-                  const colors = [
-                    "#FF6E6E",
-                    "#D05AFF",
-                    "#6A8CFF",
-                    "#4DDBFF",
-                    "#7CFFCB",
-                    "#F4FF81",
-                    "#FFE066",
-                    "#FF9E66",
-                    "#FF7BAC",
-                    "#66FFA6",
-                  ];
-
                   const percentage =
                     (resultado.puntuacionCompetencia / calcularIceGeneral()) *
                     100;
@@ -310,7 +362,7 @@ useEffect(() => {
                         style={{ backgroundColor: colors[index] }}
                       ></span>
                       <span className="legend-label">
-                        {competencias[index]} ({percentage.toFixed(1)}%)
+                        {competenciasNombres[index]} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
                   );
@@ -318,31 +370,115 @@ useEffect(() => {
               </div>
             </div>
           </div>
-
-          {/* Gráfico de IEPM (3D Bars) */}
-          <div className="iepm-chart">
-            <h4>VALORES IEPM</h4>
-            <div className="bar-chart-3d">
-              {resultados.map((resultado) => (
-                <div
-                  key={resultado.idCompetencia}
-                  className="bar-3d"
-                  style={{
-                    height: `${resultado.puntuacionCompetencia * 100}%`,
-                    backgroundColor: "#3D0301",
-                  }}
-                ></div>
-              ))}
-            </div>
-          </div>
-
-          <div className="buttons">
+          {/* Botón para mostrar resultados IEPM */}
+          <div className="iepm-button-container">
             <button
-              onClick={() => alert("Comentario agregado")}
-              className="comment-button"
+              onClick={fetchIEPMData}
+              className="iepm-button"
+              disabled={status.loading}
             >
-              Agregar Comentario
+              {showIEPM ? "Ocultar IEPM" : "Mostrar Resultados IEPM"}
             </button>
+          </div>
+          {/* Sección de resultados IEPM */}
+          {showIEPM && iepmData && (
+            <div className="iepm-results-section">
+              <h3>RESULTADOS IEPM</h3>
+
+              {/* Por dimensión */}
+              <div className="iepm-dimensions">
+                <h4>Por Dimensión</h4>
+                <div className="dimensions-grid">
+                  {iepmData.porDimension.map((dimension, index) => (
+                    <div key={index} className="dimension-card">
+                      <h5>{dimension.dimension}</h5>
+                      <p>
+                        <strong>Puntaje:</strong> {dimension.puntaje.toFixed(2)}
+                      </p>
+                      <p>
+                        <strong>Porcentaje:</strong>{" "}
+                        {dimension.porcentaje.toFixed(2)}%
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Por indicador */}
+              <div className="iepm-indicators">
+                <h4>Por Indicador</h4>
+                <table className="indicators-table">
+                  <thead>
+                    <tr>
+                      <th>Indicador</th>
+                      <th>Dimensión</th>
+                      <th>Puntaje</th>
+                      <th>Porcentaje</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {iepmData.porIndicador.map((indicador, index) => (
+                      <tr key={index}>
+                        <td>{indicador.indicador}</td>
+                        <td>{indicador.dimension}</td>
+                        <td>{indicador.puntaje.toFixed(2)}</td>
+                        <td>{indicador.porcentaje.toFixed(2)}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Acciones recomendadas */}
+              <div className="iepm-recommendations">
+                <h4>Acciones Recomendadas</h4>
+                <div className="recommendations-card">
+                  <p>
+                    <strong>Descripción:</strong>{" "}
+                    {iepmData.accionRecomendada.descripcion}
+                  </p>
+                  <p>
+                    <strong>Recomendaciones:</strong>{" "}
+                    {iepmData.accionRecomendada.recomendaciones}
+                  </p>
+                  <p>
+                    <strong>Rango:</strong> {iepmData.accionRecomendada.rango}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+       {/* Resultado general */}
+<h3>RESULTADO GENERAL</h3>
+<table className="results-table">
+  <thead>
+    <tr>
+      <th>INDICADOR</th>
+      <th>VALOR</th>
+      <th>NIVEL</th>
+      <th>ACCIONES</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ICE General</td>
+      <td>{calcularIceGeneral().toFixed(2)}</td>
+      <td>{iceGeneralInfo.nivel}</td>
+      <td>{iceGeneralInfo.acciones}</td>
+    </tr>
+    {iepmData && (
+      <tr>
+        <td>IEPM Total</td>
+        <td>{iepmData.resultadoTotal.puntaje.toFixed(2)}</td>
+        <td>{iepmData.resultadoTotal.valoracion}</td>
+        <td>{iepmData.accionRecomendada.recomendaciones}</td>
+      </tr>
+    )}
+  </tbody>
+</table>
+          
+          {/* Botones de acción */}
+          <div className="buttons">
             <button onClick={() => window.print()} className="print-button">
               Imprimir
             </button>
