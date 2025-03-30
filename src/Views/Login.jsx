@@ -9,14 +9,12 @@ const Login = ({ setUser }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState("");
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
-
     try {
       const response = await fetch("https://localhost:7075/api/Usuario/login", {
         method: "POST",
@@ -34,10 +32,24 @@ const Login = ({ setUser }) => {
         throw new Error("Credenciales incorrectas o error al contactar la API");
       }
 
-      const user = await response.json();
-
+      const data = await response.json();
+      
+      // Decodificar el token JWT para obtener los datos del usuario
+      const token = data.token;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // Crear un objeto de usuario con los datos del token
+      const user = {
+        idUsuario: payload.idUsuario,
+        nombre: email,
+        token: token,
+        tipoUsuario: payload.TipoUsuario
+      };
+      
+      // Guardar usuario en estado y localStorage
       setUser(user);
       localStorage.setItem('usuario', JSON.stringify(user));
+      
       navigate("/"); 
     } catch (error) {
       setErrorMessage("Error al conectar con la API o credenciales inválidas.");
@@ -50,7 +62,6 @@ const Login = ({ setUser }) => {
       setErrorMessage("Por favor, ingresa un correo electrónico en el modal.");
       return;
     }
-
     try {
       const response = await fetch("https://localhost:7075/api/Usuario/recuperar-contrasena", {
         method: "POST",
@@ -60,11 +71,9 @@ const Login = ({ setUser }) => {
         },
         body: JSON.stringify({ correo: recoveryEmail }),
       });
-
       if (!response.ok) {
         throw new Error("Error al intentar recuperar la contraseña");
       }
-
       setSuccessMessage("Se ha enviado un correo para recuperar tu contraseña.");
       setErrorMessage("");
       setShowModal(false);
@@ -104,11 +113,9 @@ const Login = ({ setUser }) => {
         </div>
         <button type="submit">Iniciar Sesión</button>
       </form>
-
       <button className="recover-btn" onClick={() => setShowModal(true)}>
         ¿Olvidaste tu contraseña?
       </button>
-
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">

@@ -10,7 +10,6 @@ function RegistroEmp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
-
   const [nuevoEmprendedor, setNuevoEmprendedor] = useState({
     idUsuario: "",
     nombre: "",
@@ -20,7 +19,7 @@ function RegistroEmp() {
     sueldoMensual: "0-460",
     ruc: "",
     empleadosHombres: 0,
-        empleadosMujeres: 0, 
+    empleadosMujeres: 0, 
     rangoEdadEmpleados: "18-25", 
     tipoEmpresa: "", 
     anoCreacionEmpresa: new Date().getFullYear(), 
@@ -31,20 +30,71 @@ function RegistroEmp() {
     cedula: "",
   });
 
-  // Obtener información del usuario logueado
+  // Verificar autenticación del usuario al cargar el componente
   useEffect(() => {
-    const usuarioSesion = JSON.parse(localStorage.getItem('usuario'));
+    const checkAuthentication = async () => {
+      try {
+        // Intentar obtener datos del usuario desde localStorage
+        let usuarioSesion = localStorage.getItem('usuario');
+        
+        // Si no hay datos en localStorage, verificar si puede haber un token en sessionStorage o cookies como alternativa
+        if (!usuarioSesion) {
+          console.warn("No se encontró información de usuario en localStorage");
+          
+          // Redirigir a login si definitivamente no hay datos de usuario
+          navigate('/login');
+          return;
+        }
+        
+        // Intentar parsear los datos del usuario
+        try {
+          usuarioSesion = JSON.parse(usuarioSesion);
+        } catch (parseError) {
+          console.error("Error al parsear los datos del usuario:", parseError);
+          // Si hay problemas con el formato, intentar limpiar y redirigir
+          localStorage.removeItem('usuario');
+          navigate('/login');
+          return;
+        }
+        
+        // Verificar si tenemos un objeto con estructura mínima necesaria
+        if (!usuarioSesion || (!usuarioSesion.token && !usuarioSesion.idUsuario && !usuarioSesion.id)) {
+          console.error("Datos de usuario incompletos:", usuarioSesion);
+          navigate('/login');
+          return;
+        }
+        
+        // Construir un objeto de usuario con los campos necesarios
+        const usuario = {
+          idUsuario: usuarioSesion.idUsuario || usuarioSesion.id || "",
+          nombre: usuarioSesion.nombre || usuarioSesion.email || usuarioSesion.correo || "Usuario",
+          token: usuarioSesion.token || ""
+        };
+        
+        console.log("Usuario recuperado y formateado:", usuario);
+        
+        // Solo continuar si tenemos al menos un ID de usuario
+        if (!usuario.idUsuario) {
+          console.error("No se pudo determinar el ID del usuario");
+          // Mostrar un mensaje más claro
+          alert("Error: No se pudo verificar su identidad. Por favor, inicie sesión nuevamente.");
+          navigate('/login');
+          return;
+        }
+        
+        // Actualizar el estado con los datos del usuario
+        setUsuarioLogueado(usuario);
+        setNuevoEmprendedor(prevState => ({
+          ...prevState,
+          idUsuario: usuario.idUsuario,
+        }));
+      } catch (error) {
+        console.error("Error al verificar autenticación:", error);
+        navigate('/login');
+      }
+    };
 
-    if (usuarioSesion) {
-      setUsuarioLogueado(usuarioSesion);
-      setNuevoEmprendedor(prevState => ({
-        ...prevState,
-        idUsuario: usuarioSesion.idUsuario,
-      }));
-    } else {
-      alert("Debe iniciar sesión para registrar emprendedores");
-      navigate('/login');
-    }
+    checkAuthentication();
   }, [navigate]);
 
   const opcionesRangoEdad = ["18-25", "26-65", "65+"];
@@ -52,7 +102,6 @@ function RegistroEmp() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setNuevoEmprendedor(prev => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -61,30 +110,67 @@ function RegistroEmp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Verificar de nuevo la autenticación antes de enviar el formulario
+    if (!usuarioLogueado || !nuevoEmprendedor.idUsuario) {
+      alert("Error: No hay información de usuario disponible. Por favor, inicie sesión nuevamente.");
+      navigate('/login');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
-
+    
     try {
-      if (!nuevoEmprendedor.idUsuario) {
-        throw new Error("No se ha identificado el usuario responsable del registro");
-      }
-
       console.log("Datos a enviar:", nuevoEmprendedor);
-
+      
+      // Configurar los headers con el token si está disponible
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (usuarioLogueado.token) {
+        headers['Authorization'] = `Bearer ${usuarioLogueado.token}`;
+      }
+      
+      // Enviar los datos al servidor
       const response = await axios.post(
         "https://localhost:7075/api/Emprendedores",
-        nuevoEmprendedor
+        nuevoEmprendedor,
+        { headers }
       );
-
-      console.log("Respuesta:", response.data);
+      
+      console.log("Respuesta exitosa:", response.data);
       navigate(`/emprendedor/${response.data.idEmprendedor}`);
     } catch (error) {
-      console.error("Error al registrar el emprendedor:", error.response || error);
-      setError(error);
+      console.error("Error al registrar:", error);
+      
+      // Mostrar mensaje de error más descriptivo
+      if (error.response) {
+        setError(new Error(`Error ${error.response.status}: ${error.response.data.message || 'Error en la respuesta del servidor'}`));
+      } else if (error.request) {
+        setError(new Error("No se pudo conectar con el servidor. Verifique su conexión a internet."));
+      } else {
+        setError(error);
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // Mostrar un indicador de carga mientras se verifica la autenticación
+  if (!usuarioLogueado) {
+    return (
+      <div className="App">
+        <Header />
+        <Sidebar />
+        <main className="registro-container">
+          <h1>Verificando autenticación...</h1>
+          <p>Por favor espere mientras verificamos su sesión.</p>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
@@ -92,26 +178,20 @@ function RegistroEmp() {
       <Sidebar />
       <main className="registro-container">
         <h1>REGISTRO DE EMPRENDEDOR</h1>
-
         {error && (
           <div className="error-message">
-            Error: {error.response ? error.response.data.message : error.message}
+            Error: {error.message}
           </div>
         )}
-
-        {usuarioLogueado && (
-          <div className="usuario-responsable">
-            <p><strong>Responsable del registro:</strong> {usuarioLogueado.nombre}</p>
-          </div>
-        )}
-
+        <div className="usuario-responsable">
+          <p><strong>Responsable del registro:</strong> {usuarioLogueado.nombre}</p>
+        </div>
         <form onSubmit={handleSubmit} className="info-box">
           <h2>INFORMACIÓN</h2>
           <div className="form-grid">
             {/* Información Personal */}
             <div className="form-section">
               <h3>Datos Personales</h3>
-
               <div className="form-group">
                 <label htmlFor="nombre">NOMBRES Y APELLIDOS:</label>
                 <input
@@ -123,7 +203,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="edad">EDAD:</label>
                 <input
@@ -135,7 +214,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="nivelEstudio">NIVEL DE ESTUDIO:</label>
                 <input
@@ -147,7 +225,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group checkbox-group">
                 <label htmlFor="trabajoRelacionDependencia">
                   TRABAJO RELACIÓN DEPENDENCIA:
@@ -160,7 +237,6 @@ function RegistroEmp() {
                   onChange={handleInputChange}
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="sueldoMensual">RANGO DE SUELDO:</label>
                 <select
@@ -177,7 +253,6 @@ function RegistroEmp() {
                   ))}
                 </select>
               </div>
-
               <div className="form-group">
                 <label htmlFor="cedula">CÉDULA:</label>
                 <input
@@ -190,11 +265,10 @@ function RegistroEmp() {
                 />
               </div>
             </div>
-
+            {/* Resto del formulario se mantiene igual */}
             {/* Información de Contacto */}
             <div className="form-section">
               <h3>Datos de Contacto</h3>
-
               <div className="form-group">
                 <label htmlFor="direccion">DIRECCIÓN:</label>
                 <input
@@ -206,7 +280,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="telefono">TELÉFONO:</label>
                 <input
@@ -217,7 +290,6 @@ function RegistroEmp() {
                   onChange={handleInputChange}
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="celular">CELULAR:</label>
                 <input
@@ -229,7 +301,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="correo">CORREO:</label>
                 <input
@@ -242,11 +313,9 @@ function RegistroEmp() {
                 />
               </div>
             </div>
-
             {/* Información de la Empresa */}
             <div className="form-section">
               <h3>Datos de la Empresa</h3>
-
               <div className="form-group">
                 <label htmlFor="ruc">RUC:</label>
                 <input
@@ -258,7 +327,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="tipoEmpresa">TIPO DE EMPRESA:</label>
                 <input
@@ -270,7 +338,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="anoCreacionEmpresa">AÑO DE CREACIÓN:</label>
                 <input
@@ -283,11 +350,9 @@ function RegistroEmp() {
                 />
               </div>
             </div>
-
             {/* Información de Empleados */}
             <div className="form-section">
               <h3>Datos de Empleados</h3>
-
               <div className="form-group">
                 <label htmlFor="empleadosHombres">EMPLEADOS HOMBRES:</label>
                 <input
@@ -300,7 +365,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="empleadosMujeres">EMPLEADOS MUJERES:</label>
                 <input
@@ -313,7 +377,6 @@ function RegistroEmp() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label htmlFor="rangoEdadEmpleados">RANGO DE EDAD EMPLEADOS:</label>
                 <select
@@ -332,7 +395,6 @@ function RegistroEmp() {
               </div>
             </div>
           </div>
-
           <div className="button-group">
             <button
               type="submit"
@@ -350,7 +412,6 @@ function RegistroEmp() {
             </button>
           </div>
         </form>
-
         <button className="back-btn" onClick={() => navigate(-1)}>
           Regresar
         </button>
