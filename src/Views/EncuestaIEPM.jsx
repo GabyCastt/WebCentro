@@ -14,6 +14,7 @@ const IepmSurvey = () => {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showUnansweredAlert, setShowUnansweredAlert] = useState(false);
 
   useEffect(() => {
     if (!idEmprendedor) {
@@ -66,6 +67,10 @@ const IepmSurvey = () => {
       ...prev,
       [questionId]: value
     }));
+    // Ocultar la alerta cuando se responde una pregunta
+    if (showUnansweredAlert) {
+      setShowUnansweredAlert(false);
+    }
   };
 
   const handleCommentChange = (questionId, comment) => {
@@ -122,7 +127,21 @@ const IepmSurvey = () => {
     }
   };
 
+  const checkAllQuestionsAnswered = () => {
+    if (!currentDestinatario || !groupedQuestions[currentDestinatario]) return false;
+    
+    const currentQuestions = groupedQuestions[currentDestinatario];
+    return currentQuestions.every(q => answers[q.idPregunta] !== undefined);
+  };
+
   const handleNextDestinatario = () => {
+    const allAnswered = checkAllQuestionsAnswered();
+    
+    if (!allAnswered) {
+      setShowUnansweredAlert(true);
+      return;
+    }
+
     const destinatarios = Object.keys(groupedQuestions);
     const currentIndex = destinatarios.indexOf(currentDestinatario);
     
@@ -134,10 +153,10 @@ const IepmSurvey = () => {
   };
 
   const handleSubmit = async () => {
-    const unansweredQuestions = questions.filter(q => answers[q.idPregunta] === undefined);
+    const allAnswered = checkAllQuestionsAnswered();
     
-    if (unansweredQuestions.length > 0) {
-      alert(`Por favor responda todas las preguntas antes de finalizar. Faltan ${unansweredQuestions.length} preguntas.`);
+    if (!allAnswered) {
+      setShowUnansweredAlert(true);
       return;
     }
     
@@ -190,6 +209,10 @@ const IepmSurvey = () => {
   }
 
   const currentQuestions = groupedQuestions[currentDestinatario];
+  const destinatarios = Object.keys(groupedQuestions);
+  const currentIndex = destinatarios.indexOf(currentDestinatario);
+  const isLastDestinatario = currentIndex === destinatarios.length - 1;
+  const allAnswered = checkAllQuestionsAnswered();
 
   return (
     <div className="survey-box">
@@ -200,6 +223,17 @@ const IepmSurvey = () => {
       <h2 className="destinatario-header">
         Preguntas para: <strong>{currentDestinatario}</strong>
       </h2>
+
+      {showUnansweredAlert && (
+        <div className="alert-message">
+          <p>Por favor responda todas las preguntas de esta sección antes de continuar.</p>
+          <button onClick={() => setShowUnansweredAlert(false)}>Entendido</button>
+        </div>
+      )}
+
+      <div className="progress-indicator">
+        Destinatario {currentIndex + 1} de {destinatarios.length}
+      </div>
 
       <div className="questions-container">
         {currentQuestions.map((question) => (
@@ -241,17 +275,27 @@ const IepmSurvey = () => {
         ))}
       </div>
 
-      <button 
-        onClick={handleNextDestinatario} 
-        className="next-button"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Procesando..." : 
-          Object.keys(groupedQuestions).indexOf(currentDestinatario) < 
-          Object.keys(groupedQuestions).length - 1 
-          ? "Siguiente destinatario" 
-          : "Finalizar encuesta"}
-      </button>
+      <div className="navigation-buttons">
+        {currentIndex > 0 && (
+          <button 
+            onClick={() => setCurrentDestinatario(destinatarios[currentIndex - 1])}
+            className="prev-button"
+          >
+            Anterior destinatario
+          </button>
+        )}
+
+        <button 
+          onClick={handleNextDestinatario} 
+          className={`next-button ${!allAnswered ? 'disabled' : ''}`}
+          disabled={isSubmitting || !allAnswered}
+        >
+          {isSubmitting ? "Procesando..." : 
+            isLastDestinatario 
+              ? "Finalizar encuesta" 
+              : "Siguiente destinatario"}
+        </button>
+      </div>
     </div>
   );
 };

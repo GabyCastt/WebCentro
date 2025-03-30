@@ -232,13 +232,13 @@ const Resultados = () => {
     const originalTitle = document.title;
     document.title = `Resultados_${emprendedor?.nombre || 'Emprendedor'}_${new Date().toLocaleDateString()}`;
     
-    // Temporarily hide elements not needed in print
+    // Oculta temporalmente los elementos no imprimibles
     const elementsToHide = document.querySelectorAll('.no-print');
     elementsToHide.forEach(el => el.style.display = 'none');
     
     window.print();
     
-    // Restore after printing
+    // Restaurar el título original y mostrar los elementos ocultos después de imprimir
     setTimeout(() => {
       document.title = originalTitle;
       elementsToHide.forEach(el => el.style.display = '');

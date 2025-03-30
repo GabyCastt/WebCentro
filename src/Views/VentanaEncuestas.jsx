@@ -8,6 +8,24 @@ const VentanaEncuestas = () => {
   const navigate = useNavigate();
   const { idEmprendedor } = useParams();
 
+  // Verificación adicional del ID
+  if (!idEmprendedor) {
+    return (
+      <div className="ven-container">
+        <Header />
+        <div className="ven-layout">
+          <Sidebar />
+          <div className="ven-selection">
+            <h2 className="ven-title">Los resultados aún no están disponibles.</h2>
+            <button onClick={() => navigate(-2)} className="ven-back-button">
+              Regresar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const goToIceSurvey = () => {
     navigate(`/detalles/${idEmprendedor}/encuestaice`);
   };
@@ -16,12 +34,47 @@ const VentanaEncuestas = () => {
     navigate(`/detalles/${idEmprendedor}/encuestaiepm`);
   };
 
-  const goToResults = () => {
-    navigate(`/detalles/${idEmprendedor}/resultados`);
+  const goToResults = async () => {
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const checkResults = async () => {
+      try {
+        const response = await fetch(`/api/resultados/${idEmprendedor}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          navigate(`/detalles/${idEmprendedor}/resultados`);
+        } else if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(checkResults, 1000);
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          alert(
+            errorData.title || "Los resultados aún no están disponibles."
+          );
+        }
+      } catch (error) {
+        console.error("Error de red:", error);
+        if (attempts < maxAttempts) {
+          attempts++;
+          setTimeout(checkResults, 1000);
+        } else {
+          alert("Error de conexión. Intenta nuevamente.");
+        }
+      }
+    };
+
+    checkResults();
   };
+
   const goBack = () => {
-    navigate(-1); // Regresa a la página anterior
+    navigate(-1);
   };
+
   return (
     <div className="ven-container">
       <Header />
@@ -34,8 +87,7 @@ const VentanaEncuestas = () => {
             <h3 className="ven-option-title">Encuesta ICE</h3>
             <p className="ven-option-description">
               La encuesta ICE mide las competencias emprendedoras en distintos
-              ámbitos. Está diseñada para evaluar el pensamiento crítico, la
-              proactividad y la resolución de problemas.
+              ámbitos.
             </p>
             <button onClick={goToIceSurvey} className="ven-option-button">
               Ir a Encuesta ICE
@@ -45,26 +97,21 @@ const VentanaEncuestas = () => {
           <div className="ven-option">
             <h3 className="ven-option-title">Encuesta IEPM</h3>
             <p className="ven-option-description">
-              La encuesta IEPM se enfoca en el impacto de las experiencias
-              personales en el emprendimiento. Evalúa factores motivacionales y
-              de resiliencia.
+              Evalúa factores motivacionales y de resiliencia.
             </p>
             <button onClick={goToIepmSurvey} className="ven-option-button">
               Ir a Encuesta IEPM
             </button>
           </div>
 
-          {/* Botón para ir a la ventana de resultados */}
           <div className="ven-option">
             <h3 className="ven-option-title">Resultados</h3>
             <p className="ven-option-description">
-              Revisa los resultados de las encuestas ICE e IEPM para este
-              emprendedor.
+              Revisa los resultados de las encuestas.
             </p>
             <button onClick={goToResults} className="ven-option-button">
               Ver Resultados
             </button>
-            {/* Botón de regreso agregado aquí */}
             <button onClick={goBack} className="ven-back-button">
               Regresar
             </button>
