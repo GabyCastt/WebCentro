@@ -296,7 +296,7 @@ const IepmSurvey = () => {
           {isSubmitting ? "Procesando..." : 
             isLastDestinatario 
               ? "Finalizar encuesta" 
-              : "Siguiente destinatario"}
+              : "Siguiente sección"}
         </button>
       </div>
     </div>

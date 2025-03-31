@@ -2,7 +2,7 @@
 .ice-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px;
   background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra pronunciada */
@@ -125,7 +125,21 @@
 .ice-next-button:hover {
   background-color: #0056b3;
 }
-
+/* Botón de volver competencia */
+.ice-prev-button{
+  background-color: #3424bd;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: block;
+}
+.ice-prev-button:hover {
+  background-color: #0056b3;
+}
 /* Botón de "Finalizar Encuesta" */
 .ice-finalizar-button {
   background-color: #28a745;

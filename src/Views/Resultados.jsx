@@ -21,7 +21,21 @@ const Resultados = () => {
   const [showIEPM, setShowIEPM] = useState(false);
   const [encuestasIEPM, setEncuestasIEPM] = useState([]);
   const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(true);
   const printRef = useRef();
+
+  // Efecto para controlar la visibilidad del sidebar
+  useEffect(() => {
+    if (!showSidebar) {
+      document.body.classList.add('hide-sidebar');
+    } else {
+      document.body.classList.remove('hide-sidebar');
+    }
+
+    return () => {
+      document.body.classList.remove('hide-sidebar');
+    };
+  }, [showSidebar]);
 
   // Efecto para cargar las encuestas disponibles ICE
   useEffect(() => {
@@ -236,13 +250,20 @@ const Resultados = () => {
     const elementsToHide = document.querySelectorAll('.no-print');
     elementsToHide.forEach(el => el.style.display = 'none');
     
-    window.print();
-    
-    // Restaurar el título original y mostrar los elementos ocultos después de imprimir
+    // Oculta el sidebar
+    setShowSidebar(false);
+
+    // Espera un momento para que el DOM se actualice
     setTimeout(() => {
-      document.title = originalTitle;
-      elementsToHide.forEach(el => el.style.display = '');
-    }, 1000);
+      window.print();
+      
+      // Restaurar el título original y mostrar los elementos ocultos después de imprimir
+      setTimeout(() => {
+        document.title = originalTitle;
+        elementsToHide.forEach(el => el.style.display = '');
+        setShowSidebar(true);
+      }, 1000);
+    }, 500);
   };
 
   if (status.error) {
@@ -317,7 +338,8 @@ const Resultados = () => {
     <div className="results-container">
       <Header className="no-print" />
       <div className="results-layout">
-        <Sidebar className="no-print" />
+        {showSidebar && <Sidebar className="no-print" />}
+        
         <div className="results-box" ref={printRef}>
           <h2>RESULTADOS FINALES</h2>
 
