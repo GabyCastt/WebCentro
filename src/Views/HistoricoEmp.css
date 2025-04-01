@@ -7,7 +7,7 @@
 }
 
 .historico-main-content {
-  margin-left: 10px;
+  margin-left: 150px;
   padding: 2rem;
   flex: 1;
 }
@@ -22,7 +22,7 @@
 }
 
 .historico-search-input {
-  width: 90%;
+  width: 50%;
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
   border: 1px solid #ddd;
@@ -78,9 +78,9 @@
 
 .historico-actions-container {
   display: flex;
-  justify-content: center;
+  justify-content: right;
   gap: 1.5rem;
-  margin-top: 1.5rem;
+  margin: -4rem 0 1rem 0;
 }
 
 .historico-primary-btn {
@@ -129,7 +129,52 @@
 .historico-details-btn:hover {
   background-color: #c7b78f;
 }
+/* Estilos para botón deshabilitado */
+.disabled-btn {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #cccccc !important;
+  color: #666666 !important;
+}
 
+/* Estilos para filas inactivas */
+.inactive-row {
+  background-color: #f9f9f9;
+  opacity: 0.9;
+}
+
+/* Estilos para estados */
+.status-active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #9e1b32;
+  font-style: italic;
+}
+
+/* Estilos para botones de acción */
+.historico-activate-btn {
+  background-color: #28a745;
+  color: white;
+  margin-left: 1rem;
+
+}
+
+.historico-deactivate-btn {
+  background-color: #EFDCAB;
+  color: rgb(0, 0, 0);
+  margin-left: 1rem;
+}
+
+.historico-activate-btn:hover {
+  background-color: #218838;
+}
+
+.historico-deactivate-btn:hover {
+  background-color: #dfc88f;
+}
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .historico-main-content {

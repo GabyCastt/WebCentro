@@ -29,12 +29,12 @@ function DetallesEmprendedor() {
     celular: "",
     correo: "",
     cedula: "",
-    datosEmps: [], 
+    datosEmps: [],
   });
 
   const opcionesRangoEdad = ["18-25", "26-65", "65+"];
   const opcionesRangoSueldo = ["0-460", "460-750", "750-1500"];
-useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   useEffect(() => {
@@ -51,8 +51,8 @@ useEffect(() => {
           `https://localhost:7075/api/Emprendedores/${idEmprendedor}`
         );
         setEmprendedor(response.data);
-        setEditedEmprendedor(response.data); 
-        console.log("Datos obtenidos de la API:", response.data); 
+        setEditedEmprendedor(response.data);
+        console.log("Datos obtenidos de la API:", response.data);
       } catch (error) {
         console.error("Error al obtener los datos:", error.response || error);
         setError(error);
@@ -70,14 +70,14 @@ useEffect(() => {
 
   const handleSaveClick = async () => {
     try {
-      console.log("Datos enviados a la API:", editedEmprendedor); 
+      console.log("Datos enviados a la API:", editedEmprendedor);
       const response = await axios.put(
         `https://localhost:7075/api/Emprendedores/${idEmprendedor}`,
         editedEmprendedor
       );
-      console.log("Datos actualizados:", response.data); 
+      console.log("Datos actualizados:", response.data);
       setEmprendedor(response.data || editedEmprendedor);
-      setIsEditing(false); 
+      setIsEditing(false);
     } catch (error) {
       console.error("Error al actualizar los datos:", error.response || error);
     }
@@ -108,7 +108,11 @@ useEffect(() => {
   }
 
   if (!emprendedor) {
-    return <div className="emprendedor-not-found">No se encontraron datos del emprendedor.</div>;
+    return (
+      <div className="emprendedor-not-found">
+        No se encontraron datos del emprendedor.
+      </div>
+    );
   }
 
   return (
@@ -117,15 +121,43 @@ useEffect(() => {
       <Sidebar />
       <main className="emprendedor-container">
         <h1 className="emprendedor-main-title">DETALLES DEL EMPRENDEDOR</h1>
+        <div className="emprendedor-actions-container">
+          <button
+            className="emprendedor-action-btn emprendedor-edit-btn"
+            onClick={isEditing ? handleSaveClick : handleEditClick}
+          >
+            {isEditing ? "Guardar Cambios" : "Editar Información"}
+          </button>
+          <button
+            className="emprendedor-action-btn emprendedor-survey-btn"
+            onClick={handleEncuestasClick}
+          >
+            Ver Encuestas
+          </button>
+          <button
+            className="emprendedor-action-btn emprendedor-back-btn"
+            onClick={() => navigate(-1)}
+          >
+            Volver al Listado
+          </button>
+        </div>
         <div className="emprendedor-card">
           <h2 className="emprendedor-card-header">INFORMACIÓN GENERAL</h2>
           <table className="emprendedor-details-table">
             <tbody>
               <tr className="emprendedor-detail-row">
-                <td className="emprendedor-detail-label">NOMBRES Y APELLIDOS:</td>
+                <td className="emprendedor-detail-label">
+                  NOMBRES Y APELLIDOS:
+                </td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="nombre" value={editedEmprendedor.nombre} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="nombre"
+                      value={editedEmprendedor.nombre}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.nombre
                   )}
@@ -135,9 +167,16 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">EDAD:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select name="edad" value={editedEmprendedor.edad} onChange={handleInputChange} className="emprendedor-select">
+                    <select
+                      name="edad"
+                      value={editedEmprendedor.edad}
+                      onChange={handleInputChange}
+                      className="emprendedor-select"
+                    >
                       {opcionesRangoEdad.map((opcion, index) => (
-                        <option key={index} value={opcion}>{opcion}</option>
+                        <option key={index} value={opcion}>
+                          {opcion}
+                        </option>
                       ))}
                     </select>
                   ) : (
@@ -149,27 +188,51 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">NIVEL DE ESTUDIO:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="nivelEstudio" value={editedEmprendedor.nivelEstudio} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="nivelEstudio"
+                      value={editedEmprendedor.nivelEstudio}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.nivelEstudio
                   )}
                 </td>
               </tr>
               <tr className="emprendedor-detail-row">
-                <td className="emprendedor-detail-label">TRABAJO RELACIÓN DEPENDENCIA:</td>
+                <td className="emprendedor-detail-label">
+                  TRABAJO RELACIÓN DEPENDENCIA:
+                </td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="checkbox" name="trabajoRelacionDependencia" checked={editedEmprendedor.trabajoRelacionDependencia} onChange={handleInputChange} />
-                  ) : emprendedor.trabajoRelacionDependencia ? "Sí" : "No"}
+                    <input
+                      type="checkbox"
+                      name="trabajoRelacionDependencia"
+                      checked={editedEmprendedor.trabajoRelacionDependencia}
+                      onChange={handleInputChange}
+                    />
+                  ) : emprendedor.trabajoRelacionDependencia ? (
+                    "Sí"
+                  ) : (
+                    "No"
+                  )}
                 </td>
               </tr>
               <tr className="emprendedor-detail-row">
                 <td className="emprendedor-detail-label">RANGO DE SUELDO:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select name="sueldoMensual" value={editedEmprendedor.sueldoMensual} onChange={handleInputChange} className="emprendedor-select">
+                    <select
+                      name="sueldoMensual"
+                      value={editedEmprendedor.sueldoMensual}
+                      onChange={handleInputChange}
+                      className="emprendedor-select"
+                    >
                       {opcionesRangoSueldo.map((opcion, index) => (
-                        <option key={index} value={opcion}>{opcion}</option>
+                        <option key={index} value={opcion}>
+                          {opcion}
+                        </option>
                       ))}
                     </select>
                   ) : (
@@ -181,7 +244,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">RUC:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="ruc" value={editedEmprendedor.ruc} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="ruc"
+                      value={editedEmprendedor.ruc}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.ruc
                   )}
@@ -191,7 +260,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">EMPLEADOS HOMBRES:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="number" name="empleadosHombres" value={editedEmprendedor.empleadosHombres} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="number"
+                      name="empleadosHombres"
+                      value={editedEmprendedor.empleadosHombres}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     `${emprendedor.empleadosHombres} EMPLEADOS HOMBRES`
                   )}
@@ -201,19 +276,34 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">EMPLEADOS MUJERES:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="number" name="empleadosMujeres" value={editedEmprendedor.empleadosMujeres} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="number"
+                      name="empleadosMujeres"
+                      value={editedEmprendedor.empleadosMujeres}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     `${emprendedor.empleadosMujeres} EMPLEADAS MUJERES`
                   )}
                 </td>
               </tr>
               <tr className="emprendedor-detail-row">
-                <td className="emprendedor-detail-label">RANGO DE EDAD DE EMPLEADOS:</td>
+                <td className="emprendedor-detail-label">
+                  RANGO DE EDAD DE EMPLEADOS:
+                </td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select name="rangoEdadEmpleados" value={editedEmprendedor.rangoEdadEmpleados} onChange={handleInputChange} className="emprendedor-select">
+                    <select
+                      name="rangoEdadEmpleados"
+                      value={editedEmprendedor.rangoEdadEmpleados}
+                      onChange={handleInputChange}
+                      className="emprendedor-select"
+                    >
                       {opcionesRangoEdad.map((opcion, index) => (
-                        <option key={index} value={opcion}>{opcion}</option>
+                        <option key={index} value={opcion}>
+                          {opcion}
+                        </option>
                       ))}
                     </select>
                   ) : (
@@ -225,17 +315,31 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">TIPO DE EMPRESA:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="tipoEmpresa" value={editedEmprendedor.tipoEmpresa} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="tipoEmpresa"
+                      value={editedEmprendedor.tipoEmpresa}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.tipoEmpresa
                   )}
                 </td>
               </tr>
               <tr className="emprendedor-detail-row">
-                <td className="emprendedor-detail-label">AÑO DE CREACIÓN DE LA EMPRESA:</td>
+                <td className="emprendedor-detail-label">
+                  AÑO DE CREACIÓN DE LA EMPRESA:
+                </td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="number" name="anoCreacionEmpresa" value={editedEmprendedor.anoCreacionEmpresa} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="number"
+                      name="anoCreacionEmpresa"
+                      value={editedEmprendedor.anoCreacionEmpresa}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.anoCreacionEmpresa
                   )}
@@ -245,7 +349,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">DIRECCIÓN:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="direccion" value={editedEmprendedor.direccion} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="direccion"
+                      value={editedEmprendedor.direccion}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.direccion
                   )}
@@ -255,7 +365,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">TELÉFONO:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="telefono" value={editedEmprendedor.telefono} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="telefono"
+                      value={editedEmprendedor.telefono}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.telefono
                   )}
@@ -265,7 +381,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">CELULAR:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="celular" value={editedEmprendedor.celular} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="celular"
+                      value={editedEmprendedor.celular}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.celular
                   )}
@@ -275,7 +397,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">CORREO:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="email" name="correo" value={editedEmprendedor.correo} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="email"
+                      name="correo"
+                      value={editedEmprendedor.correo}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.correo
                   )}
@@ -285,7 +413,13 @@ useEffect(() => {
                 <td className="emprendedor-detail-label">CÉDULA:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input type="text" name="cedula" value={editedEmprendedor.cedula} onChange={handleInputChange} className="emprendedor-input" />
+                    <input
+                      type="text"
+                      name="cedula"
+                      value={editedEmprendedor.cedula}
+                      onChange={handleInputChange}
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.cedula
                   )}
@@ -293,13 +427,6 @@ useEffect(() => {
               </tr>
             </tbody>
           </table>
-        </div>
-        <div className="emprendedor-actions-container">
-          <button className="emprendedor-action-btn emprendedor-edit-btn" onClick={isEditing ? handleSaveClick : handleEditClick}>
-            {isEditing ? "Guardar Cambios" : "Editar Información"}
-          </button>
-          <button className="emprendedor-action-btn emprendedor-survey-btn" onClick={handleEncuestasClick}>Ver Encuestas</button>
-          <button className="emprendedor-action-btn emprendedor-back-btn" onClick={() => navigate(-1)}>Volver al Listado</button>
         </div>
       </main>
     </div>

@@ -10,6 +10,7 @@
   color: #140E4E;
   margin-bottom: 20px;
   font-weight: bold;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .info-box {
@@ -21,12 +22,14 @@
   text-align: left;
   width: 90%;
   max-width: 1200px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .info-box h2 {
   color: #140E4E;
   text-align: center;
   margin-bottom: 25px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .form-grid {
@@ -49,6 +52,8 @@
   border-bottom: 1px solid #ddd;
   padding-bottom: 8px;
   font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
 }
 
 .form-group {

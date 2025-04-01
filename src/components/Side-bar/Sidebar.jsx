@@ -33,6 +33,8 @@ const Menu = () => {
   const handleHistoricoClick = () => navigate("/historico");
   const handleRegistroClick = () => navigate("/registroemp");
   const handleReporteriaClick = () => navigate("/reporteriarol");
+  const handleBIClick = () => navigate("/bi");
+  const handleIAClick = () => navigate("/ia");
   const handleLogout = () => {
     setUser(null);
     navigate("/login");
@@ -65,6 +67,12 @@ const Menu = () => {
             </button>
             <button className="menu-button" onClick={handleReporteriaClick}>
               REPORTERÍA
+            </button>
+            <button className="menu-button" onClick={handleBIClick}>
+              BUSSINESS
+            </button>
+            <button className="menu-button" onClick={handleIAClick}>
+              INTELIGENCIA ARTIFICIAL
             </button>
             <button className="menu-button" onClick={handleLogout}>
               SALIR

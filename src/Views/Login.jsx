@@ -11,7 +11,6 @@ const Login = ({ setUser }) => {
   const [recoveryEmail, setRecoveryEmail] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
 
   // Validación de email
@@ -29,38 +28,15 @@ const Login = ({ setUser }) => {
     return true;
   };
 
-  // Validación de contraseña
-  const validatePassword = (password) => {
-    if (password.length < 8) {
-      setPasswordError("La contraseña debe tener al menos 8 caracteres");
-      return false;
-    }
-    if (!/[A-Z]/.test(password)) {
-      setPasswordError("La contraseña debe contener al menos una letra mayúscula");
-      return false;
-    }
-    if (!/[0-9]/.test(password)) {
-      setPasswordError("La contraseña debe contener al menos un número");
-      return false;
-    }
-    if (password.includes(' ')) {
-      setPasswordError("La contraseña no debe contener espacios en blanco");
-      return false;
-    }
-    setPasswordError("");
-    return true;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
 
-    // Validar email y contraseña antes de enviar
+    // Validar email antes de enviar
     const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
 
-    if (!isEmailValid || !isPasswordValid) {
+    if (!isEmailValid) {
       return;
     }
 
@@ -149,10 +125,6 @@ const Login = ({ setUser }) => {
     if (email) validateEmail(email);
   }, [email]);
 
-  useEffect(() => {
-    if (password) validatePassword(password);
-  }, [password]);
-
   return (
     <div className="login-container">
       <h2>Iniciar Sesión</h2>
@@ -180,14 +152,10 @@ const Login = ({ setUser }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {passwordError && <p className="field-error">{passwordError}</p>}
-          <p className="password-requirements">
-            La contraseña debe tener mínimo 8 caracteres, incluir mayúsculas, minúsculas y números.
-          </p>
         </div>
         <button 
           type="submit" 
-          disabled={isProcessing || emailError || passwordError}
+          disabled={isProcessing || emailError}
         >
           {isProcessing ? "Procesando..." : "Iniciar Sesión"}
         </button>

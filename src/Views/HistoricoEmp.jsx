@@ -1,63 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './HistoricoEmp.css';
-import Header from '../components/Header/Header';
-import Sidebar from '../components/Side-bar/Sidebar';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./HistoricoEmp.css";
+import Header from "../components/Header/Header";
+import Sidebar from "../components/Side-bar/Sidebar";
 
 function HistoricoEmp() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [emprendedores, setEmprendedores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); 
-useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  useEffect(() => {
-    const fetchEmprendedores = async () => {
-      try {
-        const response = await axios.get('https://localhost:7075/api/Emprendedores');
-        setEmprendedores(response.data);
-      } catch (error) {
-        console.warn("No se pudo obtener los datos del backend.");
-        setEmprendedores([]); 
-      } finally {
-        setLoading(false);
-      }
-    };
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
     fetchEmprendedores();
   }, []);
 
-  const filteredEmprendedores = emprendedores.filter((emprendedor) =>
-    emprendedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (emprendedor.correo && emprendedor.correo.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  const handleDetailsClick = (idEmprendedor) => {
-    console.log("ID del emprendedor en HistoricoEmp:", idEmprendedor);
-    navigate(`/detalles/${idEmprendedor}`);
-  };
-
-  const handleDeleteClick = async (idEmprendedor) => {
+  const fetchEmprendedores = async () => {
     try {
-      await axios.delete(`https://localhost:7075/api/Emprendedores/${idEmprendedor}`);
-      setEmprendedores((prevEmprendedores) =>
-        prevEmprendedores.filter((emprendedor) => emprendedor.idEmprendedor !== idEmprendedor)
-      );
-      alert("Emprendedor eliminado correctamente");
+      const response = await axios.get("https://localhost:7075/api/Emprendedores");
+      setEmprendedores(response.data);
     } catch (error) {
-      console.error("Error al eliminar el emprendedor:", error.response || error);
-      alert("Error al eliminar el emprendedor");
+      console.error("Error cargando emprendedores:", error);
+      alert("Error al cargar datos");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleButton1Click = () => {
-    alert('Reporte General generado');
+  const handleInactivar = async (idEmprendedor) => {
+    try {
+      await axios.delete(`https://localhost:7075/api/Emprendedores/${idEmprendedor}`);
+      
+      setEmprendedores(prev => prev.map(emp => 
+        emp.idEmprendedor === idEmprendedor 
+          ? { ...emp, estado: false, fechaInactivacion: new Date().toISOString() } 
+          : emp
+      ));
+      
+      alert("Emprendedor inactivado correctamente");
+    } catch (error) {
+      console.error("Error inactivando:", error);
+      alert("Error al inactivar");
+    }
   };
 
-  const handleButton2Click = () => {
-    navigate("/registroemp"); 
+  const handleActivar = async (idEmprendedor) => {
+    try {
+      await axios.put(`https://localhost:7075/api/Emprendedores/activate/${idEmprendedor}`);
+      
+      setEmprendedores(prev => prev.map(emp => 
+        emp.idEmprendedor === idEmprendedor 
+          ? { ...emp, estado: true, fechaInactivacion: null } 
+          : emp
+      ));
+      
+      alert("Emprendedor reactivado correctamente");
+    } catch (error) {
+      console.error("Error reactivando:", error);
+      alert("Error al reactivar");
+    }
+  };
+
+  const handleDetailsClick = (emprendedor) => {
+    if (!emprendedor.estado) {
+      alert("No se puede acceder a los detalles de un emprendedor inactivo");
+      return;
+    }
+    navigate(`/detalles/${emprendedor.idEmprendedor}`);
+  };
+
+  const filteredEmprendedores = emprendedores.filter(
+    (emprendedor) =>
+      emprendedor.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emprendedor.correo?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const formatFecha = (fecha) => {
+    if (!fecha) return "Activo";
+    const date = new Date(fecha);
+    return `Inactivo desde ${date.toLocaleDateString('es-ES')}`;
   };
 
   return (
@@ -66,6 +88,7 @@ useEffect(() => {
       <Sidebar />
       <main className="historico-main-content">
         <h1 className="historico-title">HISTÓRICO EMPRENDEDORES</h1>
+        
         <input
           type="text"
           className="historico-search-input"
@@ -73,47 +96,86 @@ useEffect(() => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        
+        <div className="historico-actions-container">
+          <button
+            className="historico-primary-btn historico-add-btn"
+            onClick={() => navigate("/registroemp")}
+          >
+            Añadir Emprendedor
+          </button>
+        </div>
 
-        <table className="historico-table">
-          <thead className="historico-table-header">
-            <tr>
-              <th>#</th>
-              <th>Nombre Emprendedor</th>
-              <th>Correo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEmprendedores.length > 0 ? (
-              filteredEmprendedores.map((emprendedor) => (
-                <tr key={emprendedor.idEmprendedor} className="historico-table-row">
-                  <td className="historico-table-cell">{emprendedor.fecha}</td>
-                  <td className="historico-table-cell">{emprendedor.nombre}</td>
-                  <td className="historico-table-cell">{emprendedor.correo || 'No registrado'}</td>
-                  <td className="historico-table-cell">
-                    <button
-                      className="historico-action-btn historico-details-btn"
-                      onClick={() => handleDetailsClick(emprendedor.idEmprendedor)}
-                    >
-                      Detalles
-                    </button>
+        {loading ? (
+          <div className="historico-no-data">Cargando...</div>
+        ) : (
+          <table className="historico-table">
+            <thead className="historico-table-header">
+              <tr>
+                <th>#</th>
+                <th>Nombre Emprendedor</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEmprendedores.length > 0 ? (
+                filteredEmprendedores.map((emprendedor) => (
+                  <tr
+                    key={emprendedor.idEmprendedor}
+                    className={`historico-table-row ${!emprendedor.estado ? 'inactive-row' : ''}`}
+                  >
+                    <td className="historico-table-cell">{emprendedor.idEmprendedor}</td>
+                    <td className="historico-table-cell">{emprendedor.nombre}</td>
+                    <td className="historico-table-cell">
+                      {emprendedor.correo || "No registrado"}
+                    </td>
+                    <td className="historico-table-cell">
+                      {emprendedor.estado ? (
+                        <span className="status-active">Activo</span>
+                      ) : (
+                        <span className="status-inactive">
+                          {formatFecha(emprendedor.fechaInactivacion)}
+                        </span>
+                      )}
+                    </td>
+                    <td className="historico-table-cell historico-actions">
+                      <button
+                        className={`historico-action-btn historico-details-btn ${!emprendedor.estado ? 'disabled-btn' : ''}`}
+                        onClick={() => handleDetailsClick(emprendedor)}
+                        disabled={!emprendedor.estado}
+                      >
+                        Detalles
+                      </button>
+                      {emprendedor.estado ? (
+                        <button
+                          className="historico-action-btn historico-deactivate-btn"
+                          onClick={() => handleInactivar(emprendedor.idEmprendedor)}
+                        >
+                          Inactivar
+                        </button>
+                      ) : (
+                        <button
+                          className="historico-action-btn historico-activate-btn"
+                          onClick={() => handleActivar(emprendedor.idEmprendedor)}
+                        >
+                          Activar
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="historico-no-data">
+                    No hay datos disponibles.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="historico-no-data">
-                  No hay datos disponibles.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-
-        <div className="historico-actions-container">
-          <button className="historico-primary-btn historico-report-btn" onClick={handleButton1Click}>Reporte General</button>
-          <button className="historico-primary-btn historico-add-btn" onClick={handleButton2Click}>Añadir Emprendedor</button>
-        </div>
+              )}
+            </tbody>
+          </table>
+        )}
       </main>
     </div>
   );
