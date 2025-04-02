@@ -1,152 +1,167 @@
-/* Estilos para el componente de Inteligencia Artificial */
-
+/* Estilos generales */
 .ia-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .ia-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-    background-color: #1e3a8a;
-    padding: 20px 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    width: 100%;
-    max-width: 800px;
-    margin-bottom: 40px;
-  }
-  
-  .ia-form {
-    width: 100%;
-    max-width: 500px;
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .ia-form-group {
-    margin-bottom: 20px;
-  }
-  
-  .ia-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-bottom: 8px;
-  }
-  
-  .ia-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
-  
-  .ia-input:focus {
-    border-color: #1e3a8a;
-  }
-  
-  .ia-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-bottom: 10px;
-  }
-  
-  .ia-button:hover {
-    background-color: #0d946e;
-  }
-  
-  .ia-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .ia-error {
-    color: #ff4d4f;
-    font-size: 0.875rem;
-    margin-top: 10px;
-    text-align: center;
-  }
-  
-  .ia-result-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    width: 100%;
-    max-width: 600px;
-  }
-  
-  .ia-text-container {
-    text-align: center;
-  }
-  
-  .ia-business-name {
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #1e3a8a;
-    margin-bottom: 15px;
-  }
-  
-  .ia-info-text {
-    color: #333;
-    font-size: 1rem;
-    margin-bottom: 8px;
-  }
-  
-  .ia-slogan {
-    color: #10b981;
-    font-size: 1.125rem;
-    font-weight: 500;
-    margin-bottom: 15px;
-  }
-  
-  .ia-image-container {
-    margin-top: 20px;
-  }
-  
-  .ia-logo-image {
-    width: 200px;
-    height: 200px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .ia-title {
-      font-size: 1.5rem;
-      padding: 15px 20px;
-    }
-    
-    .ia-form, .ia-result-container {
-      padding: 20px;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ia-main-content {
+  margin-left: 60px; /* Ajuste para el sidebar */
+  padding: 4rem;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 60px); /* Ajuste para el header */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ia-title {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.ia-subtitle {
+  color: #34495e;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* Formulario centrado */
+.ia-generator-form {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 800px; /* Ancho máximo para mejor legibilidad */
+}
+
+.ia-form-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.ia-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #34495e;
+  text-align: left; /* Alinea el texto del label a la izquierda */
+}
+
+.ia-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ia-input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.ia-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ia-textarea:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* Botones */
+.ia-actions-container {
+  display: flex;
+  justify-content: center; /* Centra el botón */
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.ia-primary-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ia-primary-btn:hover {
+  background-color: #2980b9;
+}
+
+.ia-primary-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* Resultados */
+.ia-result-container {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px; /* Mismo ancho que el formulario */
+  margin-top: 2rem;
+}
+
+.ia-result-title {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.ia-slogan-text {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #2c3e50;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.ia-logo-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem auto;
+  display: block; /* Para centrar la imagen */
+}
+
+/* Mensajes de error */
+.ia-error-message {
+  color: #e74c3c;
+  background: #fdecea;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 4px solid #e74c3c;
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+}
