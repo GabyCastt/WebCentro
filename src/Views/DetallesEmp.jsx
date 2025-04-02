@@ -32,8 +32,27 @@ function DetallesEmprendedor() {
     datosEmps: [],
   });
 
-  const opcionesRangoEdad = ["18-25", "26-65", "65+"];
-  const opcionesRangoSueldo = ["0-460", "460-750", "750-1500"];
+  const opcionesRangoEdad = ["18-25", "26-35", "36-45", "46-59", "60+"];
+  const opcionesRangoSueldo = ["0-460", "460-750", "750-1000", "1000+"];
+  const opcionesNivelEstudio = [
+    "Primaria",
+    "Secundaria",
+    "Bachillerato",
+    "Licenciatura",
+    "Técnico",
+    "Tecnológico",
+    "Superior",
+    "Postgrado",
+    "Maestría",
+    "Doctorado",
+    "Especialización",
+    "Certificación Profesional",
+    "Formación Profesional",
+    "Educación Preescolar",
+    "Educación Media Superior",
+    "Ninguno"
+  ];
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -167,18 +186,13 @@ function DetallesEmprendedor() {
                 <td className="emprendedor-detail-label">EDAD:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <select
+                    <input
+                      type="number"
                       name="edad"
                       value={editedEmprendedor.edad}
                       onChange={handleInputChange}
-                      className="emprendedor-select"
-                    >
-                      {opcionesRangoEdad.map((opcion, index) => (
-                        <option key={index} value={opcion}>
-                          {opcion}
-                        </option>
-                      ))}
-                    </select>
+                      className="emprendedor-input"
+                    />
                   ) : (
                     emprendedor.edad
                   )}
@@ -188,18 +202,27 @@ function DetallesEmprendedor() {
                 <td className="emprendedor-detail-label">NIVEL DE ESTUDIO:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
+                    <select
+                      id="nivelEstudio"
                       name="nivelEstudio"
                       value={editedEmprendedor.nivelEstudio}
                       onChange={handleInputChange}
-                      className="emprendedor-input"
-                    />
+                      required
+                      className="emprendedor-select"
+                    >
+                      <option value="">Seleccione...</option>
+                      {opcionesNivelEstudio.map((opcion, index) => (
+                        <option key={index} value={opcion}>
+                          {opcion}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
                     emprendedor.nivelEstudio
                   )}
                 </td>
               </tr>
+
               <tr className="emprendedor-detail-row">
                 <td className="emprendedor-detail-label">
                   TRABAJO RELACIÓN DEPENDENCIA:

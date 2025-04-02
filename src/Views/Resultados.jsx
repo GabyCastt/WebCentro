@@ -20,20 +20,67 @@ const Resultados = () => {
   const [iepmData, setIepmData] = useState(null);
   const [showIEPM, setShowIEPM] = useState(false);
   const [encuestasIEPM, setEncuestasIEPM] = useState([]);
-  const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] = useState(null);
+  const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] =
+    useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [comentarios, setComentarios] = useState("");
+  const [showComentarios, setShowComentarios] = useState(false);
+  const [comentariosSeleccionados, setComentariosSeleccionados] = useState([]);
+  const [showSideComments, setShowSideComments] = useState(false);
   const printRef = useRef();
+
+  // Comentarios predefinidos actualizados
+  const comentariosPredefinidos = {
+    Capacitación: [
+      "Capacitación en programas de formación empresarial - Desarrollo de competencias en gestión y administración",
+      "Capacitación en dirección estratégica - Enfoque en toma de decisiones y liderazgo organizacional",
+      "Capacitación en comercialización - Estrategias de mercado y ventas",
+      "Capacitación de personal calificado - Desarrollo de competencias técnicas y profesionales",
+    ],
+    Herramientas: [
+      "Herramientas económicas y financieras - Análisis financiero y gestión de recursos",
+      "Herramientas de tecnología e innovación - Aplicación de tecnologías emergentes en negocios",
+    ],
+    Evaluación: [
+      "Evaluación del marco legal - Análisis de normativas y regulaciones para su cumplimiento",
+      "Identificación de deficiencias en servicios municipales - Trabajo con gas municipales y ministerios para mejorar servicios públicos",
+      "Revisión de la matriz productiva del país y la región - Evaluación de sectores estratégicos para el desarrollo",
+      "Identificación de necesidades para la viabilidad técnica de negocios - Evaluación de oportunidades y riesgos",
+    ],
+    Otros: [
+      "Tolerancia a la incertidumbre y proyección social - Factores clave en la toma de decisiones",
+      "Revisión y adquisición de información sobre fuentes de financiamiento - Análisis de alternativas económicas",
+      "Estudio del territorio para abastecimiento y localización de instalaciones - Planificación logística y operativa",
+      "Clasificación según nivel de puesta en marcha - Segmentación en baja, media, mediana y alta para la planificación estratégica",
+    ],
+  };
+
+  // Cargar comentarios guardados al iniciar
+  useEffect(() => {
+    const savedComentarios = localStorage.getItem(
+      `comentarios_${idEmprendedor}`
+    );
+    if (savedComentarios) {
+      setComentarios(savedComentarios);
+      // Extraer comentarios seleccionados del texto guardado
+      const comentariosArray = savedComentarios
+        .split("\n")
+        .filter((line) => line.startsWith("- "))
+        .map((line) => line.substring(2));
+      setComentariosSeleccionados(comentariosArray);
+    }
+  }, [idEmprendedor]);
 
   // Efecto para controlar la visibilidad del sidebar
   useEffect(() => {
     if (!showSidebar) {
-      document.body.classList.add('hide-sidebar');
+      document.body.classList.add("hide-sidebar");
     } else {
-      document.body.classList.remove('hide-sidebar');
+      document.body.classList.remove("hide-sidebar");
     }
 
     return () => {
-      document.body.classList.remove('hide-sidebar');
+      document.body.classList.remove("hide-sidebar");
     };
   }, [showSidebar]);
 
@@ -94,7 +141,7 @@ const Resultados = () => {
 
         const data = await response.json();
         setEncuestasIEPM(data);
-        
+
         if (data.length > 0) {
           setEncuestaSeleccionadaIEPM(data[0].idEncuesta);
         }
@@ -170,7 +217,6 @@ const Resultados = () => {
         const response = await fetch(
           `https://localhost:7075/api/PreguntasIepm/ResultadosCompletos/${idEmprendedor}`
         );
-
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${await response.text()}`);
         }
@@ -244,26 +290,77 @@ const Resultados = () => {
   // Función para manejar la impresión
   const handlePrint = () => {
     const originalTitle = document.title;
-    document.title = `Resultados_${emprendedor?.nombre || 'Emprendedor'}_${new Date().toLocaleDateString()}`;
-    
-    // Oculta temporalmente los elementos no imprimibles
-    const elementsToHide = document.querySelectorAll('.no-print');
-    elementsToHide.forEach(el => el.style.display = 'none');
-    
-    // Oculta el sidebar
-    setShowSidebar(false);
+    document.title = `Resultados_${
+      emprendedor?.nombre || "Emprendedor"
+    }_${new Date().toLocaleDateString()}`;
 
-    // Espera un momento para que el DOM se actualice
+    // Ocultar elementos - usa selectores más específicos
+    const header = document.querySelector("header, .header, .header-container");
+    const sidebar = document.querySelector(".sidebar, .sidebar-container");
+
+    if (header) {
+      header.style.visibility = "hidden";
+      header.style.position = "absolute"; // Para que no ocupe espacio
+    }
+
+    if (sidebar) {
+      sidebar.style.visibility = "hidden";
+      sidebar.style.position = "absolute";
+    }
+
+    // Forzar colores en impresión
+    document.querySelectorAll(".pie-slice").forEach((slice) => {
+      slice.style.webkitPrintColorAdjust = "exact";
+      slice.style.printColorAdjust = "exact";
+    });
+
     setTimeout(() => {
       window.print();
-      
-      // Restaurar el título original y mostrar los elementos ocultos después de imprimir
+
+      // Restaurar después de imprimir
       setTimeout(() => {
         document.title = originalTitle;
-        elementsToHide.forEach(el => el.style.display = '');
-        setShowSidebar(true);
-      }, 1000);
+        if (header) {
+          header.style.visibility = "";
+          header.style.position = "";
+        }
+        if (sidebar) {
+          sidebar.style.visibility = "";
+          sidebar.style.position = "";
+        }
+      }, 500);
     }, 500);
+  };
+
+  // Función para añadir un comentario seleccionado
+  const agregarComentario = (comentario) => {
+    // Si ya está seleccionado, no lo añadimos de nuevo
+    if (!comentariosSeleccionados.includes(comentario)) {
+      setComentariosSeleccionados([...comentariosSeleccionados, comentario]);
+
+      // También lo añadimos al textarea
+      const nuevoComentario = comentarios
+        ? `${comentarios}\n- ${comentario}`
+        : `- ${comentario}`;
+      setComentarios(nuevoComentario);
+    }
+  };
+
+  // Función para eliminar un comentario seleccionado
+  const eliminarComentario = (index) => {
+    const nuevosComentarios = [...comentariosSeleccionados];
+    nuevosComentarios.splice(index, 1);
+    setComentariosSeleccionados(nuevosComentarios);
+
+    // Actualizar también el textarea
+    setComentarios(nuevosComentarios.map((c) => `- ${c}`).join("\n"));
+  };
+
+  // Función para guardar comentarios
+  const guardarComentarios = () => {
+    localStorage.setItem(`comentarios_${idEmprendedor}`, comentarios);
+    setShowComentarios(false);
+    setShowSideComments(false);
   };
 
   if (status.error) {
@@ -339,7 +436,7 @@ const Resultados = () => {
       <Header className="no-print" />
       <div className="results-layout">
         {showSidebar && <Sidebar className="no-print" />}
-        
+
         <div className="results-box" ref={printRef}>
           <h2>RESULTADOS FINALES</h2>
 
@@ -353,13 +450,17 @@ const Resultados = () => {
             </p>
             <p>
               <strong>Fecha de generación:</strong>{" "}
-              <span className="data-box">{new Date().toLocaleDateString()}</span>
+              <span className="data-box">
+                {new Date().toLocaleDateString()}
+              </span>
             </p>
           </div>
 
           {/* Selector de encuestas ICE */}
           <div className="encuesta-selector no-print">
-            <label htmlFor="select-encuesta-ice">Seleccione una encuesta ICE: </label>
+            <label htmlFor="select-encuesta-ice">
+              Seleccione la encuesta de ICE correspondiente:{" "}
+            </label>
             <select
               id="select-encuesta-ice"
               value={encuestaSeleccionada || ""}
@@ -370,7 +471,8 @@ const Resultados = () => {
             >
               {encuestas.map((encuesta) => (
                 <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
-                  Encuesta ID: {encuesta.idEncuesta}
+                  Número de encuesta y fecha de su aplicación:{" "}
+                  {encuesta.idEncuesta}
                 </option>
               ))}
             </select>
@@ -378,7 +480,9 @@ const Resultados = () => {
 
           {/* Selector de encuestas IEPM */}
           <div className="encuesta-selector no-print">
-            <label htmlFor="select-encuesta-iepm">Seleccione una encuesta IEPM: </label>
+            <label htmlFor="select-encuesta-iepm">
+              Seleccione la encuesta de IEPM correspondiente:{" "}
+            </label>
             <select
               id="select-encuesta-iepm"
               value={encuestaSeleccionadaIEPM || ""}
@@ -389,7 +493,9 @@ const Resultados = () => {
             >
               {encuestasIEPM.map((encuesta) => (
                 <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
-                  Encuesta {encuesta.idEncuesta} - {new Date(encuesta.fechaAplicacion).toLocaleDateString()}
+                  Número de encuesta y fecha de su aplicación:{" "}
+                  {encuesta.idEncuesta} -{" "}
+                  {new Date(encuesta.fechaAplicacion).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -403,30 +509,44 @@ const Resultados = () => {
             </p>
             <p>
               <strong>Encuesta IEPM seleccionada:</strong>{" "}
-              <span className="data-box">{encuestaSeleccionadaIEPM || "N/A"}</span>
+              <span className="data-box">
+                {encuestaSeleccionadaIEPM || "N/A"}
+              </span>
             </p>
           </div>
 
           {/* Resultados por dimensión ICE */}
           <div className="results-section">
-            <h3>CÁLCULO ICE POR DIMENSIÓN:</h3>
+            <h3>CÁLCULO ICE POR COMPETENCIA:</h3>
             <div className="ice-dimensions">
-              {competenciasNombres.map((nombre, index) => (
-                <p key={index}>
-                  {nombre} →{" "}
-                  <span className="data-box">
-                    {getValorCompetencia(index + 1)}
-                  </span>
-                </p>
-              ))}
+              <div className="dimensions-column">
+                {competenciasNombres.slice(0, 5).map((nombre, index) => (
+                  <p key={index}>
+                    {nombre} →{" "}
+                    <span className="data-box">
+                      {getValorCompetencia(index + 1)}
+                    </span>
+                  </p>
+                ))}
+              </div>
+              <div className="dimensions-column">
+                {competenciasNombres.slice(5).map((nombre, index) => (
+                  <p key={index + 5}>
+                    {nombre} →{" "}
+                    <span className="data-box">
+                      {getValorCompetencia(index + 6)}
+                    </span>
+                  </p>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Gráfico de pastel ICE */}
-          <div className="pie-chart-container">
+          {/* Gráfico de pastel ICE con clases para impresión */}
+          <div className="pie-chart-container print-pie-chart">
             <h4>VALORACIÓN ICE</h4>
             {activeTooltip && (
-              <div className="custom-tooltip">
+              <div className="custom-tooltip no-print">
                 {activeTooltip.competencia}: {activeTooltip.percentage}%
               </div>
             )}
@@ -446,7 +566,7 @@ const Resultados = () => {
                   return (
                     <div
                       key={resultado.idCompetencia}
-                      className="pie-slice"
+                      className="pie-slice print-pie-slice"
                       style={{
                         backgroundColor: colors[index],
                         transform: `rotate(${offset}deg)`,
@@ -464,7 +584,7 @@ const Resultados = () => {
                 })}
               </div>
 
-              <div className="pie-legend">
+              <div className="pie-legend print-pie-legend">
                 {resultados.map((resultado, index) => {
                   const percentage =
                     (resultado.puntuacionCompetencia / calcularIceGeneral()) *
@@ -473,7 +593,7 @@ const Resultados = () => {
                   return (
                     <div key={resultado.idCompetencia} className="legend-item">
                       <span
-                        className="legend-color"
+                        className="legend-color print-legend-color"
                         style={{ backgroundColor: colors[index] }}
                       ></span>
                       <span className="legend-label">
@@ -495,10 +615,22 @@ const Resultados = () => {
               <div className="iepm-total">
                 <h4>Resultado General</h4>
                 <div className="total-card">
-                  <p><strong>Puntaje:</strong> {iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}</p>
-                  <p><strong>Porcentaje:</strong> {iepmData.resultadoTotal?.porcentaje?.toFixed(1) || "N/A"}%</p>
-                  <p><strong>Valoración:</strong> {iepmData.resultadoTotal?.valoracion || "N/A"}</p>
-                  <p><strong>Criterio:</strong> {iepmData.resultadoTotal?.criterio || "N/A"}</p>
+                  <p>
+                    <strong>Puntaje:</strong>{" "}
+                    {iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Porcentaje:</strong>{" "}
+                    {iepmData.resultadoTotal?.porcentaje?.toFixed(1) || "N/A"}%
+                  </p>
+                  <p>
+                    <strong>Valoración:</strong>{" "}
+                    {iepmData.resultadoTotal?.valoracion || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Criterio:</strong>{" "}
+                    {iepmData.resultadoTotal?.criterio || "N/A"}
+                  </p>
                 </div>
               </div>
 
@@ -509,8 +641,14 @@ const Resultados = () => {
                   {iepmData.porDimension?.map((dimension, index) => (
                     <div key={index} className="dimension-card">
                       <h5>{dimension.dimension}</h5>
-                      <p><strong>Puntaje:</strong> {dimension.puntaje?.toFixed(3) || "N/A"}</p>
-                      <p><strong>Porcentaje:</strong> {dimension.porcentaje?.toFixed(1) || "N/A"}%</p>
+                      <p>
+                        <strong>Puntaje:</strong>{" "}
+                        {dimension.puntaje?.toFixed(3) || "N/A"}
+                      </p>
+                      <p>
+                        <strong>Porcentaje:</strong>{" "}
+                        {dimension.porcentaje?.toFixed(1) || "N/A"}%
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -545,9 +683,18 @@ const Resultados = () => {
               <div className="iepm-recommendations">
                 <h4>Acciones Recomendadas</h4>
                 <div className="recommendations-card">
-                  <p><strong>Descripción:</strong> {iepmData.accionRecomendada?.descripcion || "N/A"}</p>
-                  <p><strong>Recomendaciones:</strong> {iepmData.accionRecomendada?.recomendaciones || "N/A"}</p>
-                  <p><strong>Rango:</strong> {iepmData.accionRecomendada?.rango || "N/A"}</p>
+                  <p>
+                    <strong>Descripción:</strong>{" "}
+                    {iepmData.accionRecomendada?.descripcion || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Recomendaciones:</strong>{" "}
+                    {iepmData.accionRecomendada?.recomendaciones || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Rango:</strong>{" "}
+                    {iepmData.accionRecomendada?.rango || "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -568,26 +715,138 @@ const Resultados = () => {
               <tbody>
                 <tr>
                   <td>ICE General</td>
-                  <td>{calcularIceGeneral().toFixed(2)}</td>
+                  <td>
+                    {resultados.length > 0
+                      ? `${calcularIceGeneral().toFixed(2)}/1`
+                      : "N/A"}
+                  </td>
                   <td>{iceGeneralInfo.nivel}</td>
                   <td>{iceGeneralInfo.acciones}</td>
                 </tr>
                 {iepmData && (
                   <tr>
                     <td>IEPM Total</td>
-                    <td>{iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}</td>
+                    <td>
+                      {iepmData.resultadoTotal?.puntaje
+                        ? `${iepmData.resultadoTotal.puntaje.toFixed(3)}/1`
+                        : "N/A"}
+                    </td>
                     <td>{iepmData.resultadoTotal?.valoracion || "N/A"}</td>
-                    <td>{iepmData.accionRecomendada?.recomendaciones || "N/A"}</td>
+                    <td>
+                      {iepmData.accionRecomendada?.recomendaciones || "N/A"}
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-          
+
+          {/* Sección de comentarios */}
+          {showComentarios ? (
+            <div className="comments-section">
+              <h3>COMENTARIOS ADICIONALES</h3>
+
+              <div className="comments-content">
+                {/* Comentarios seleccionados */}
+                {comentariosSeleccionados.length > 0 && (
+                  <div className="selected-comments">
+                    <h4>Comentarios Seleccionados:</h4>
+                    <ul>
+                      {comentariosSeleccionados.map((comentario, index) => (
+                        <li key={index} className="selected-comment-item">
+                          {comentario}
+                          <button
+                            onClick={() => eliminarComentario(index)}
+                            className="remove-comment-button"
+                          >
+                            ×
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <textarea
+                  value={comentarios}
+                  onChange={(e) => setComentarios(e.target.value)}
+                  placeholder="Escribe aquí tus comentarios adicionales o selecciona comentarios predefinidos..."
+                  className="comments-textarea"
+                />
+
+                {/* Comentarios predefinidos */}
+                {showSideComments && (
+                  <div className="predefined-comments">
+                    <h4>Comentarios Predefinidos</h4>
+                    {Object.entries(comentariosPredefinidos).map(
+                      ([categoria, comentariosCategoria]) => (
+                        <div key={categoria} className="comment-category">
+                          <h5>{categoria}</h5>
+                          <ul>
+                            {comentariosCategoria.map((comentario, idx) => (
+                              <li
+                                key={idx}
+                                onClick={() => agregarComentario(comentario)}
+                                className="comment-item"
+                              >
+                                {comentario}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="comments-buttons">
+                <button onClick={guardarComentarios} className="save-button">
+                  Guardar
+                </button>
+                <button
+                  onClick={() => {
+                    setShowComentarios(false);
+                    setShowSideComments(false);
+                  }}
+                  className="cancel-button"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => setShowSideComments(!showSideComments)}
+                  className="toggle-comments-button"
+                >
+                  {showSideComments
+                    ? "Ocultar Comentarios"
+                    : "Mostrar Comentarios"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="comments-preview">
+              {comentarios && (
+                <div className="saved-comments">
+                  <h3>COMENTARIOS ADICIONALES</h3>
+                  <p>{comentarios}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Botones de acción */}
           <div className="buttons no-print">
             <button onClick={handlePrint} className="print-button">
               Imprimir
+            </button>
+            <button
+              onClick={() => {
+                setShowComentarios(true);
+                setShowSideComments(true);
+              }}
+              className="comments-button"
+            >
+              {comentarios ? "Editar Comentarios" : "Agregar Comentarios"}
             </button>
           </div>
         </div>
