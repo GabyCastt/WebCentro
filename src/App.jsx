@@ -17,7 +17,7 @@ import Resultados from "./Views/Resultados";
 import Home from "./Views/Home";
 import ReporteriaRol from "./Views/ReporteriaRol.jsx";
 import BI from "./Views/BI.jsx";
-//import IA from "./Views/IA.jsx";
+import IA from "./Views/IA.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -57,7 +57,8 @@ function App() {
               <Route path="/reporteriarol" element={<ReporteriaRol />} /> </Route>
               <Route path="/bi" element={<BI />} />
               <Route path="/bi/:idEmprendedor" element={<BI />} />
-              {/*<Route path="/ia" element={<IA />} />*/}
+            
+              <Route path="/ia" element={<IA />} />
           </Routes>
         </div>
       </Router>
