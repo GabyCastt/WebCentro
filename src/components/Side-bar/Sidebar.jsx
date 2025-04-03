@@ -69,7 +69,7 @@ const Menu = () => {
               REPORTERÍA
             </button>
             <button className="menu-button" onClick={handleBIClick}>
-              BUSSINESS
+              DASHBOARD
             </button>
             <button className="menu-button" onClick={handleIAClick}>
               INTELIGENCIA ARTIFICIAL

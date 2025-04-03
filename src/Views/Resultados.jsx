@@ -27,6 +27,8 @@ const Resultados = () => {
   const [showComentarios, setShowComentarios] = useState(false);
   const [comentariosSeleccionados, setComentariosSeleccionados] = useState([]);
   const [showSideComments, setShowSideComments] = useState(false);
+  const [indicadoresInfo, setIndicadoresInfo] = useState([]);
+  const [dimensionesInfo, setDimensionesInfo] = useState([]);
   const printRef = useRef();
 
   // Comentarios predefinidos actualizados
@@ -84,6 +86,58 @@ const Resultados = () => {
     };
   }, [showSidebar]);
 
+  // Cargar información de indicadores y dimensiones
+  useEffect(() => {
+    const fetchIndicadoresDimensiones = async () => {
+      try {
+        const response = await fetch(
+          "https://localhost:7075/api/PreguntasIepm/detailed"
+        );
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${await response.text()}`);
+        }
+        const data = await response.json();
+
+        // Extraer información única de indicadores
+        const indicadoresUnicos = {};
+        data.forEach((pregunta) => {
+          if (!indicadoresUnicos[pregunta.indicador]) {
+            indicadoresUnicos[pregunta.indicador] = {
+              idCuestionario: pregunta.idCuestionario,
+              destinatario: pregunta.destinatario,
+            };
+          }
+        });
+
+        // Mapear IDs de indicadores (asumiendo que idCuestionario corresponde a idIndicador)
+        const indicadoresMapeados = Object.entries(indicadoresUnicos).map(
+          ([nombre, info], index) => ({
+            idIndicador: info.idCuestionario, // Asumiendo que idCuestionario corresponde a idIndicador
+            nombre: nombre,
+            destinatario: info.destinatario,
+          })
+        );
+
+        setIndicadoresInfo(indicadoresMapeados);
+
+        // Crear dimensiones basadas en los cuestionarios (asumiendo 3 dimensiones)
+        const dimensiones = [
+          { idDimension: 1, nombre: "Dimensión Económica" },
+          { idDimension: 2, nombre: "Dimensión Operacional" },
+          { idDimension: 3, nombre: "Dimensión de Innovación" },
+        ];
+        setDimensionesInfo(dimensiones);
+      } catch (error) {
+        console.error(
+          "Error al cargar información de indicadores y dimensiones:",
+          error
+        );
+      }
+    };
+
+    fetchIndicadoresDimensiones();
+  }, []);
+
   // Efecto para cargar las encuestas disponibles ICE
   useEffect(() => {
     const fetchEncuestas = async () => {
@@ -100,15 +154,11 @@ const Resultados = () => {
 
         const data = await response.json();
 
-        const encuestasFormateadas = Array.isArray(data)
-          ? data.map((id) => ({ idEncuesta: id }))
-          : [];
-
-        setEncuestas(encuestasFormateadas);
+        setEncuestas(data);
         setStatus((prev) => ({ ...prev, loadedEncuestas: true }));
 
-        if (encuestasFormateadas.length > 0) {
-          setEncuestaSeleccionada(encuestasFormateadas[0].idEncuesta);
+        if (data.length > 0) {
+          setEncuestaSeleccionada(data[0].idEncuesta);
         } else {
           setStatus((prev) => ({ ...prev, loading: false }));
         }
@@ -182,11 +232,7 @@ const Resultados = () => {
 
         const resultadosData = await resultadosRes.json();
 
-        const resultadosArray = Array.isArray(resultadosData)
-          ? resultadosData
-          : resultadosData.resultados || resultadosData.data || [];
-
-        setResultados(resultadosArray);
+        setResultados(resultadosData.resultados || []);
         setStatus((prev) => ({
           ...prev,
           loading: false,
@@ -215,14 +261,60 @@ const Resultados = () => {
         setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await fetch(
-          `https://localhost:7075/api/PreguntasIepm/ResultadosCompletos/${idEmprendedor}`
+          `https://localhost:7075/api/IepmCalculation/Resultado/${idEmprendedor}/${encuestaSeleccionadaIEPM}`
         );
+
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${await response.text()}`);
         }
 
         const data = await response.json();
-        setIepmData(data);
+
+        // Función para obtener nombre del indicador
+        const getNombreIndicador = (idIndicador) => {
+          const indicador = indicadoresInfo.find(
+            (i) => i.idIndicador === idIndicador
+          );
+          return indicador ? indicador.nombre : `Indicador ${idIndicador}`;
+        };
+
+        // Función para obtener nombre de la dimensión
+        const getNombreDimension = (idDimension) => {
+          const dimension = dimensionesInfo.find(
+            (d) => d.idDimension === idDimension
+          );
+          return dimension ? dimension.nombre : `Dimensión ${idDimension}`;
+        };
+
+        // Transformar los datos al formato esperado por el componente
+        const transformedData = {
+          resultadoTotal: {
+            puntaje: data.iepm?.iepm,
+            valoracion: data.iepm?.valoracion,
+            criterio: data.accionMejora?.descripcion,
+          },
+          porDimension: data.dimensiones?.map((d) => ({
+            idDimension: d.idDimension,
+            dimension: getNombreDimension(d.idDimension),
+            puntaje: d.valor,
+            porcentaje: (d.valor / 5) * 100, // Asumiendo que el máximo es 5
+          })),
+          porIndicador: data.indicadores?.map((i) => ({
+            idIndicador: i.idIndicador,
+            indicador: getNombreIndicador(i.idIndicador),
+            idDimension: Math.ceil(i.idIndicador / 3), // Asumiendo 3 indicadores por dimensión
+            dimension: getNombreDimension(Math.ceil(i.idIndicador / 3)),
+            puntaje: i.valor,
+            porcentaje: (i.valor / 5) * 100, // Asumiendo que el máximo es 5
+          })),
+          accionRecomendada: {
+            descripcion: data.accionMejora?.descripcion,
+            recomendaciones: data.accionMejora?.recomendaciones,
+            rango: `${data.accionMejora?.rangoMin}-${data.accionMejora?.rangoMax}`,
+          },
+        };
+
+        setIepmData(transformedData);
         setShowIEPM(true);
       } catch (error) {
         console.error("Error al cargar resultados IEPM:", error);
@@ -236,7 +328,12 @@ const Resultados = () => {
     };
 
     fetchIEPMData();
-  }, [idEmprendedor, encuestaSeleccionadaIEPM]);
+  }, [
+    idEmprendedor,
+    encuestaSeleccionadaIEPM,
+    indicadoresInfo,
+    dimensionesInfo,
+  ]);
 
   // Función para obtener el valor de una competencia específica
   const getValorCompetencia = (idCompetencia) => {
@@ -294,22 +391,16 @@ const Resultados = () => {
       emprendedor?.nombre || "Emprendedor"
     }_${new Date().toLocaleDateString()}`;
 
-    // Ocultar elementos - usa selectores más específicos
-    const header = document.querySelector("header, .header, .header-container");
-    const sidebar = document.querySelector(".sidebar, .sidebar-container");
+    // Ocultar Header y Sidebar manualmente
+    const header = document.querySelector("header");
+    const sidebar = document.querySelector(".sidebar-container");
 
-    if (header) {
-      header.style.visibility = "hidden";
-      header.style.position = "absolute"; // Para que no ocupe espacio
-    }
+    if (header) header.style.display = "none";
+    if (sidebar) sidebar.style.display = "none";
 
-    if (sidebar) {
-      sidebar.style.visibility = "hidden";
-      sidebar.style.position = "absolute";
-    }
-
-    // Forzar colores en impresión
-    document.querySelectorAll(".pie-slice").forEach((slice) => {
+    // Asegurar que el gráfico de pastel sea visible al imprimir
+    const pieSlices = document.querySelectorAll(".pie-slice");
+    pieSlices.forEach((slice) => {
       slice.style.webkitPrintColorAdjust = "exact";
       slice.style.printColorAdjust = "exact";
     });
@@ -317,28 +408,20 @@ const Resultados = () => {
     setTimeout(() => {
       window.print();
 
-      // Restaurar después de imprimir
+      // Restaurar el título original y mostrar los elementos ocultos después de imprimir
       setTimeout(() => {
         document.title = originalTitle;
-        if (header) {
-          header.style.visibility = "";
-          header.style.position = "";
-        }
-        if (sidebar) {
-          sidebar.style.visibility = "";
-          sidebar.style.position = "";
-        }
-      }, 500);
+        if (header) header.style.display = "";
+        if (sidebar) sidebar.style.display = "";
+      }, 1000);
     }, 500);
   };
 
   // Función para añadir un comentario seleccionado
   const agregarComentario = (comentario) => {
-    // Si ya está seleccionado, no lo añadimos de nuevo
     if (!comentariosSeleccionados.includes(comentario)) {
       setComentariosSeleccionados([...comentariosSeleccionados, comentario]);
 
-      // También lo añadimos al textarea
       const nuevoComentario = comentarios
         ? `${comentarios}\n- ${comentario}`
         : `- ${comentario}`;
@@ -352,7 +435,6 @@ const Resultados = () => {
     nuevosComentarios.splice(index, 1);
     setComentariosSeleccionados(nuevosComentarios);
 
-    // Actualizar también el textarea
     setComentarios(nuevosComentarios.map((c) => `- ${c}`).join("\n"));
   };
 
@@ -442,19 +524,25 @@ const Resultados = () => {
 
           {/* Información del emprendedor */}
           <div className="results-info print-header">
-            <p>
-              <strong>Emprendedor:</strong>{" "}
-              <span className="data-box">
-                {emprendedor ? emprendedor.nombre : "N/A"}
-              </span>
-            </p>
-            <p>
-              <strong>Fecha de generación:</strong>{" "}
-              <span className="data-box">
-                {new Date().toLocaleDateString()}
-              </span>
-            </p>
-          </div>
+  <p>
+    <strong>Emprendedor:</strong>{" "}
+    <span className="data-box">
+      {emprendedor ? emprendedor.nombre : "N/A"}
+    </span>
+  </p>
+  <p>
+    <strong>Fecha de generación:</strong>{" "}
+    <span className="data-box">{new Date().toLocaleDateString()}</span>
+  </p>
+  {resultados.length > 0 && (
+    <p>
+      <strong>Fecha de evaluación:</strong>{" "}
+      <span className="data-box">
+        {new Date(encuestas.find(e => e.idEncuesta === encuestaSeleccionada)?.fechaEvaluacion || new Date()).toLocaleDateString()}
+      </span>
+    </p>
+  )}
+</div>
 
           {/* Selector de encuestas ICE */}
           <div className="encuesta-selector no-print">
@@ -471,8 +559,8 @@ const Resultados = () => {
             >
               {encuestas.map((encuesta) => (
                 <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
-                  Número de encuesta y fecha de su aplicación:{" "}
-                  {encuesta.idEncuesta}
+                  Número de Encuesta y fecha de su aplicación: {encuesta.idEncuesta} -{" "}
+                  {new Date(encuesta.fechaEvaluacion).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -542,7 +630,7 @@ const Resultados = () => {
             </div>
           </div>
 
-          {/* Gráfico de pastel ICE con clases para impresión */}
+          {/* Gráfico de pastel ICE */}
           <div className="pie-chart-container print-pie-chart">
             <h4>VALORACIÓN ICE</h4>
             {activeTooltip && (
@@ -617,11 +705,7 @@ const Resultados = () => {
                 <div className="total-card">
                   <p>
                     <strong>Puntaje:</strong>{" "}
-                    {iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Porcentaje:</strong>{" "}
-                    {iepmData.resultadoTotal?.porcentaje?.toFixed(1) || "N/A"}%
+                    {iepmData.resultadoTotal?.puntaje?.toFixed(3) || "N/A"}/1
                   </p>
                   <p>
                     <strong>Valoración:</strong>{" "}
@@ -643,7 +727,7 @@ const Resultados = () => {
                       <h5>{dimension.dimension}</h5>
                       <p>
                         <strong>Puntaje:</strong>{" "}
-                        {dimension.puntaje?.toFixed(3) || "N/A"}
+                        {dimension.puntaje?.toFixed(3) || "N/A"}/5
                       </p>
                       <p>
                         <strong>Porcentaje:</strong>{" "}
@@ -671,7 +755,7 @@ const Resultados = () => {
                       <tr key={index}>
                         <td>{indicador.indicador}</td>
                         <td>{indicador.dimension}</td>
-                        <td>{indicador.puntaje?.toFixed(3) || "N/A"}</td>
+                        <td>{indicador.puntaje?.toFixed(3) || "N/A"}/5</td>
                         <td>{indicador.porcentaje?.toFixed(1) || "N/A"}%</td>
                       </tr>
                     ))}

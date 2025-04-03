@@ -50,9 +50,16 @@ function DetallesEmprendedor() {
     "Formación Profesional",
     "Educación Preescolar",
     "Educación Media Superior",
-    "Ninguno"
+    "Ninguno",
   ];
-  
+  const opcionesTipoEmpresa = [
+    "Unipersonal",
+    "Sociedad",
+    "Cooperativa",
+    "Asociación",
+    "Fundación",
+  ];
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -338,15 +345,21 @@ function DetallesEmprendedor() {
                 <td className="emprendedor-detail-label">TIPO DE EMPRESA:</td>
                 <td className="emprendedor-detail-value">
                   {isEditing ? (
-                    <input
-                      type="text"
+                    <select
                       name="tipoEmpresa"
-                      value={editedEmprendedor.tipoEmpresa}
+                      value={editedEmprendedor.tipoEmpresa || ""}
                       onChange={handleInputChange}
-                      className="emprendedor-input"
-                    />
+                      className="emprendedor-select"
+                    >
+                      <option value="">Seleccione...</option>
+                      {opcionesTipoEmpresa.map((opcion, index) => (
+                        <option key={index} value={opcion}>
+                          {opcion}
+                        </option>
+                      ))}
+                    </select>
                   ) : (
-                    emprendedor.tipoEmpresa
+                    emprendedor.tipoEmpresa || "No especificado"
                   )}
                 </td>
               </tr>
