@@ -32,9 +32,24 @@ function RegistroEmp() {
   });
 
   // Opciones para selects
-  const opcionesRangoEdad = ["18-25", "26-65", "65+"];
-  const opcionesRangoSueldo = ["0-460", "460-750", "750-1500"];
-  const opcionesNivelEstudio = ["Primaria", "Secundaria", "Superior", "Postgrado", "Ninguno"];
+  const opcionesRangoEdad = ["18-25", "26-35", "36-45", "46-59", "60+"];
+  const opcionesRangoSueldo = ["0-460", "460-750", "750-1000", "1000+"];
+  const opcionesNivelEstudio = [ "Primaria",
+    "Secundaria",
+    "Bachillerato",
+    "Licenciatura",
+    "Técnico",
+    "Tecnológico",
+    "Superior",
+    "Postgrado",
+    "Maestría",
+    "Doctorado",
+    "Especialización",
+    "Certificación Profesional",
+    "Formación Profesional",
+    "Educación Preescolar",
+    "Educación Media Superior",
+    "Ninguno"];
   const opcionesTipoEmpresa = ["Unipersonal", "Sociedad", "Cooperativa", "Asociación", "Fundación"];
 
   // Verificar autenticación del usuario al cargar el componente
@@ -112,8 +127,8 @@ function RegistroEmp() {
         break;
         
       case 'ruc':
-        if (!value) error = 'El RUC es requerido';
-        else if (!/^\d{13}$/.test(value)) error = 'El RUC debe tener 13 dígitos';
+        // RUC es opcional, pero si tiene valor debe tener 13 dígitos
+        if (value && !/^\d{13}$/.test(value)) error = 'El RUC debe tener 13 dígitos';
         break;
         
       case 'correo':
@@ -175,7 +190,7 @@ function RegistroEmp() {
     
     // Validar todos los campos requeridos
     Object.keys(nuevoEmprendedor).forEach(key => {
-      if (key !== 'telefono' && key !== 'trabajoRelacionDependencia') {
+      if (key !== 'telefono' && key !== 'trabajoRelacionDependencia' && key !== 'ruc') {
         const error = validateField(key, nuevoEmprendedor[key]);
         if (error) {
           errors[key] = error;
@@ -226,9 +241,15 @@ function RegistroEmp() {
         headers['Authorization'] = `Bearer ${usuarioLogueado.token}`;
       }
       
+      // Preparar los datos para enviar, con valor por defecto para RUC si está vacío
+      const datosParaEnviar = {
+        ...nuevoEmprendedor,
+        ruc: nuevoEmprendedor.ruc || "0" // Si RUC está vacío, se envía "0"
+      };
+      
       const response = await axios.post(
         "https://localhost:7075/api/Emprendedores",
-        nuevoEmprendedor,
+        datosParaEnviar,
         { headers }
       );
       
@@ -449,10 +470,10 @@ function RegistroEmp() {
                   name="ruc"
                   value={nuevoEmprendedor.ruc}
                   onChange={handleInputChange}
-                  required
                   maxLength="13"
                   pattern="\d{13}"
                   className={fieldErrors.ruc ? 'error-input' : ''}
+                  placeholder="Opcional"
                 />
                 {fieldErrors.ruc && <span className="field-error">{fieldErrors.ruc}</span>}
               </div>
