@@ -15,15 +15,15 @@ function RegistroEmp() {
     idUsuario: "",
     nombre: "",
     edad: "",
-    nivelEstudio: "", 
-    trabajoRelacionDependencia: false, 
+    nivelEstudio: "",
+    trabajoRelacionDependencia: false,
     sueldoMensual: "0-460",
     ruc: "",
     empleadosHombres: 0,
-    empleadosMujeres: 0, 
-    rangoEdadEmpleados: "18-25", 
-    tipoEmpresa: "", 
-    anoCreacionEmpresa: new Date().getFullYear(), 
+    empleadosMujeres: 0,
+    rangoEdadEmpleados: "18-25",
+    tipoEmpresa: "",
+    anoCreacionEmpresa: new Date().getFullYear(),
     direccion: "",
     telefono: "",
     celular: "",
@@ -34,7 +34,8 @@ function RegistroEmp() {
   // Opciones para selects
   const opcionesRangoEdad = ["18-25", "26-35", "36-45", "46-59", "60+"];
   const opcionesRangoSueldo = ["0-460", "460-750", "750-1000", "1000+"];
-  const opcionesNivelEstudio = [ "Primaria",
+  const opcionesNivelEstudio = [
+    "Primaria",
     "Secundaria",
     "Bachillerato",
     "Licenciatura",
@@ -49,136 +50,146 @@ function RegistroEmp() {
     "Formación Profesional",
     "Educación Preescolar",
     "Educación Media Superior",
-    "Ninguno"];
-  const opcionesTipoEmpresa = ["Unipersonal", "Sociedad", "Cooperativa", "Asociación", "Fundación"];
+    "Ninguno",
+  ];
+  const opcionesTipoEmpresa = [
+    "Unipersonal",
+    "Sociedad",
+    "Cooperativa",
+    "Asociación",
+    "Fundación",
+  ];
 
   // Verificar autenticación del usuario al cargar el componente
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        let usuarioSesion = localStorage.getItem('usuario');
-        
+        let usuarioSesion = localStorage.getItem("usuario");
         if (!usuarioSesion) {
           console.warn("No se encontró información de usuario en localStorage");
-          navigate('/login');
+          navigate("/login");
           return;
         }
-        
         try {
           usuarioSesion = JSON.parse(usuarioSesion);
         } catch (parseError) {
           console.error("Error al parsear los datos del usuario:", parseError);
-          localStorage.removeItem('usuario');
-          navigate('/login');
+          localStorage.removeItem("usuario");
+          navigate("/login");
           return;
         }
-        
-        if (!usuarioSesion || (!usuarioSesion.token && !usuarioSesion.idUsuario && !usuarioSesion.id)) {
+        if (
+          !usuarioSesion ||
+          (!usuarioSesion.token &&
+            !usuarioSesion.idUsuario &&
+            !usuarioSesion.id)
+        ) {
           console.error("Datos de usuario incompletos:", usuarioSesion);
-          navigate('/login');
+          navigate("/login");
           return;
         }
-        
         const usuario = {
           idUsuario: usuarioSesion.idUsuario || usuarioSesion.id || "",
-          nombre: usuarioSesion.nombre || usuarioSesion.email || usuarioSesion.correo || "Usuario",
-          token: usuarioSesion.token || ""
+          nombre:
+            usuarioSesion.nombre ||
+            usuarioSesion.email ||
+            usuarioSesion.correo ||
+            "Usuario",
+          token: usuarioSesion.token || "",
         };
-        
         if (!usuario.idUsuario) {
           console.error("No se pudo determinar el ID del usuario");
-          alert("Error: No se pudo verificar su identidad. Por favor, inicie sesión nuevamente.");
-          navigate('/login');
+          alert(
+            "Error: No se pudo verificar su identidad. Por favor, inicie sesión nuevamente."
+          );
+          navigate("/login");
           return;
         }
-        
         setUsuarioLogueado(usuario);
-        setNuevoEmprendedor(prevState => ({
+        setNuevoEmprendedor((prevState) => ({
           ...prevState,
           idUsuario: usuario.idUsuario,
         }));
       } catch (error) {
         console.error("Error al verificar autenticación:", error);
-        navigate('/login');
+        navigate("/login");
       }
     };
-
     checkAuthentication();
   }, [navigate]);
 
   const validateField = (name, value) => {
-    let error = '';
-    
-    switch(name) {
-      case 'nombre':
-        if (!value.trim()) error = 'El nombre es requerido';
-        else if (value.length < 3) error = 'El nombre debe tener al menos 3 caracteres';
+    let error = "";
+    switch (name) {
+      case "nombre":
+        if (!value.trim()) error = "El nombre es requerido";
+        else if (value.length < 3)
+          error = "El nombre debe tener al menos 3 caracteres";
         break;
-        
-      case 'edad':
-        if (!value) error = 'La edad es requerida';
-        else if (isNaN(value) || parseInt(value) < 18 || parseInt(value) > 120) 
-          error = 'La edad debe estar entre 18 y 120 años';
+      case "edad":
+        if (!value) error = "La edad es requerida";
+        else if (isNaN(value) || parseInt(value) < 18 || parseInt(value) > 120)
+          error = "La edad debe estar entre 18 y 120 años";
         break;
-        
-      case 'cedula':
-        if (!value) error = 'La cédula es requerida';
-        else if (!/^\d{10}$/.test(value)) error = 'La cédula debe tener 10 dígitos';
+      case "cedula":
+        if (!value) error = "La cédula es requerida";
+        else if (!/^\d{10}$/.test(value))
+          error = "La cédula debe tener 10 dígitos";
         break;
-        
-      case 'ruc':
-        // RUC es opcional, pero si tiene valor debe tener 13 dígitos
-        if (value && !/^\d{13}$/.test(value)) error = 'El RUC debe tener 13 dígitos';
+      case "ruc":
+        // RUC es opcional, pero si tiene valor debe tener 13 dígitos y terminar con 001
+        //if (value && value.trim() !== "" && value !== "") {
+         // if (!/^\d{13}$/.test(value)) {
+         //   error = "El RUC debe tener 13 dígitos";
+         // } else if (!value.endsWith("001")) {
+          //  error = "El RUC debe terminar con 001";
+         // }
+       // }
         break;
-        
-      case 'correo':
-        if (!value) error = 'El correo es requerido';
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) 
-          error = 'Por favor ingrese un correo electrónico válido';
+      case "correo":
+        if (!value) error = "El correo es requerido";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          error = "Por favor ingrese un correo electrónico válido";
         break;
-        
-      case 'celular':
-        if (!value) error = 'El celular es requerido';
-        else if (!/^[\d\s-]{7,15}$/.test(value)) 
-          error = 'Por favor ingrese un número de celular válido';
+      case "celular":
+        if (!value) error = "El celular es requerido";
+        else if (!/^[\d\s-]{7,15}$/.test(value))
+          error = "Por favor ingrese un número de celular válido";
         break;
-        
-      case 'telefono':
-        if (value && !/^[\d\s-]{7,15}$/.test(value)) 
-          error = 'Por favor ingrese un número de teléfono válido';
+      case "telefono":
+        if (value && !/^[\d\s-]{7,15}$/.test(value))
+          error = "Por favor ingrese un número de teléfono válido";
         break;
-        
-      case 'anoCreacionEmpresa':
+      case "anoCreacionEmpresa":
         const currentYear = new Date().getFullYear();
-        if (!value) error = 'El año de creación es requerido';
-        else if (isNaN(value) || parseInt(value) < 1900 || parseInt(value) > currentYear) 
+        if (!value) error = "El año de creación es requerido";
+        else if (
+          isNaN(value) ||
+          parseInt(value) < 1900 ||
+          parseInt(value) > currentYear
+        )
           error = `El año debe estar entre 1900 y ${currentYear}`;
         break;
-        
-      case 'empleadosHombres':
-      case 'empleadosMujeres':
-        if (isNaN(value) || parseInt(value) < 0) 
-          error = 'Debe ser un número positivo';
+      case "empleadosHombres":
+      case "empleadosMujeres":
+        if (isNaN(value) || parseInt(value) < 0)
+          error = "Debe ser un número positivo";
         break;
-        
-      case 'nivelEstudio':
-      case 'tipoEmpresa':
-        if (!value) error = 'Este campo es requerido';
+      case "nivelEstudio":
+      case "tipoEmpresa":
+        if (!value) error = "Este campo es requerido";
         break;
     }
-    
     return error;
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const fieldValue = type === 'checkbox' ? checked : value;
-    
+    const fieldValue = type === "checkbox" ? checked : value;
     // Validar el campo en tiempo real
     const error = validateField(name, fieldValue);
-    setFieldErrors(prev => ({ ...prev, [name]: error }));
-    
-    setNuevoEmprendedor(prev => ({
+    setFieldErrors((prev) => ({ ...prev, [name]: error }));
+    setNuevoEmprendedor((prev) => ({
       ...prev,
       [name]: fieldValue,
     }));
@@ -187,10 +198,14 @@ function RegistroEmp() {
   const validateForm = () => {
     const errors = {};
     let isValid = true;
-    
+
     // Validar todos los campos requeridos
-    Object.keys(nuevoEmprendedor).forEach(key => {
-      if (key !== 'telefono' && key !== 'trabajoRelacionDependencia' && key !== 'ruc') {
+    Object.keys(nuevoEmprendedor).forEach((key) => {
+      if (
+        key !== "telefono" &&
+        key !== "trabajoRelacionDependencia" &&
+        key !== "ruc"
+      ) {
         const error = validateField(key, nuevoEmprendedor[key]);
         if (error) {
           errors[key] = error;
@@ -198,78 +213,93 @@ function RegistroEmp() {
         }
       }
     });
-    
+
     // Validación de coherencia de datos
-    if (nuevoEmprendedor.trabajoRelacionDependencia && nuevoEmprendedor.sueldoMensual === "0-460") {
-      errors.sueldoMensual = 'Si tiene trabajo en relación de dependencia, su sueldo no puede estar en el rango más bajo';
+    if (
+      nuevoEmprendedor.trabajoRelacionDependencia &&
+      nuevoEmprendedor.sueldoMensual === "0-460"
+    ) {
+      errors.sueldoMensual =
+        "Si tiene trabajo en relación de dependencia, su sueldo no puede estar en el rango más bajo";
       isValid = false;
     }
-    
-    const totalEmpleados = parseInt(nuevoEmprendedor.empleadosHombres) + parseInt(nuevoEmprendedor.empleadosMujeres);
-    if (totalEmpleados > 0 && !nuevoEmprendedor.ruc) {
-      errors.ruc = 'Si tiene empleados, debe tener RUC';
+
+    // Eliminamos esta validación para permitir RUC vacío aun cuando hay empleados
+    /*
+    const totalEmpleados =
+      parseInt(nuevoEmprendedor.empleadosHombres) +
+      parseInt(nuevoEmprendedor.empleadosMujeres);
+    if (totalEmpleados > 0 && (!nuevoEmprendedor.ruc || nuevoEmprendedor.ruc === "0000000000000")) {
+      errors.ruc = "Si tiene empleados, debe tener RUC válido";
       isValid = false;
     }
-    
+    */
+
     setFieldErrors(errors);
     return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!usuarioLogueado || !nuevoEmprendedor.idUsuario) {
-      alert("Error: No hay información de usuario disponible. Por favor, inicie sesión nuevamente.");
-      navigate('/login');
+      alert(
+        "Error: No hay información de usuario disponible. Por favor, inicie sesión nuevamente."
+      );
+      navigate("/login");
       return;
     }
-    
     if (!validateForm()) {
-      setError(new Error('Por favor corrija los errores en el formulario'));
+      setError(new Error("Por favor corrija los errores en el formulario"));
       return;
     }
-    
     setLoading(true);
     setError(null);
-    
     try {
       const headers = {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       };
-      
       if (usuarioLogueado.token) {
-        headers['Authorization'] = `Bearer ${usuarioLogueado.token}`;
+        headers["Authorization"] = `Bearer ${usuarioLogueado.token}`;
       }
-      
-      // Preparar los datos para enviar, con valor por defecto para RUC si está vacío
+
+      // Preparar los datos para enviar - Siempre asignar "" cuando RUC está vacío
       const datosParaEnviar = {
         ...nuevoEmprendedor,
-        ruc: nuevoEmprendedor.ruc || "0" // Si RUC está vacío, se envía "0"
+        // Si RUC está vacío, enviar ""
+        ruc: nuevoEmprendedor.ruc && nuevoEmprendedor.ruc.trim() !== "" ? nuevoEmprendedor.ruc : ""
       };
-      
+
       const response = await axios.post(
         "https://localhost:7075/api/Emprendedores",
         datosParaEnviar,
         { headers }
       );
-      
       navigate(`/emprendedor/${response.data.idEmprendedor}`);
     } catch (error) {
       console.error("Error al registrar:", error);
-      
       if (error.response) {
         if (error.response.data.errors) {
           const serverErrors = {};
-          Object.keys(error.response.data.errors).forEach(key => {
-            serverErrors[key] = error.response.data.errors[key].join(', ');
+          Object.keys(error.response.data.errors).forEach((key) => {
+            serverErrors[key] = error.response.data.errors[key].join(", ");
           });
           setFieldErrors(serverErrors);
           setError(new Error("Por favor corrija los errores en el formulario"));
         } else {
-          setError(new Error(`Error ${error.response.status}: ${error.response.data.message || 'Error en el servidor'}`));
+          setError(
+            new Error(
+              `Error ${error.response.status}: ${
+                error.response.data.message || "Error en el servidor"
+              }`
+            )
+          );
         }
       } else if (error.request) {
-        setError(new Error("No se pudo conectar con el servidor. Verifique su conexión a internet."));
+        setError(
+          new Error(
+            "No se pudo conectar con el servidor. Verifique su conexión a internet."
+          )
+        );
       } else {
         setError(error);
       }
@@ -297,13 +327,11 @@ function RegistroEmp() {
       <Sidebar />
       <main className="registro-container">
         <h1>REGISTRO DE EMPRENDEDOR</h1>
-        {error && (
-          <div className="error-message">
-            Error: {error.message}
-          </div>
-        )}
+        {error && <div className="error-message">Error: {error.message}</div>}
         <div className="usuario-responsable">
-          <p><strong>Responsable del registro:</strong> {usuarioLogueado.nombre}</p>
+          <p>
+            <strong>Responsable del registro:</strong> {usuarioLogueado.nombre}
+          </p>
         </div>
         <form onSubmit={handleSubmit} className="info-box">
           <h2>INFORMACIÓN</h2>
@@ -320,9 +348,11 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.nombre}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.nombre ? 'error-input' : ''}
+                  className={fieldErrors.nombre ? "error-input" : ""}
                 />
-                {fieldErrors.nombre && <span className="field-error">{fieldErrors.nombre}</span>}
+                {fieldErrors.nombre && (
+                  <span className="field-error">{fieldErrors.nombre}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="edad">EDAD:</label>
@@ -335,9 +365,11 @@ function RegistroEmp() {
                   required
                   min="18"
                   max="120"
-                  className={fieldErrors.edad ? 'error-input' : ''}
+                  className={fieldErrors.edad ? "error-input" : ""}
                 />
-                {fieldErrors.edad && <span className="field-error">{fieldErrors.edad}</span>}
+                {fieldErrors.edad && (
+                  <span className="field-error">{fieldErrors.edad}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="nivelEstudio">NIVEL DE ESTUDIO:</label>
@@ -347,14 +379,20 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.nivelEstudio}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.nivelEstudio ? 'error-input' : ''}
+                  className={fieldErrors.nivelEstudio ? "error-input" : ""}
                 >
                   <option value="">Seleccione...</option>
                   {opcionesNivelEstudio.map((opcion, index) => (
-                    <option key={index} value={opcion}>{opcion}</option>
+                    <option key={index} value={opcion}>
+                      {opcion}
+                    </option>
                   ))}
                 </select>
-                {fieldErrors.nivelEstudio && <span className="field-error">{fieldErrors.nivelEstudio}</span>}
+                {fieldErrors.nivelEstudio && (
+                  <span className="field-error">
+                    {fieldErrors.nivelEstudio}
+                  </span>
+                )}
               </div>
               <div className="form-group checkbox-group">
                 <label htmlFor="trabajoRelacionDependencia">
@@ -376,7 +414,7 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.sueldoMensual}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.sueldoMensual ? 'error-input' : ''}
+                  className={fieldErrors.sueldoMensual ? "error-input" : ""}
                 >
                   {opcionesRangoSueldo.map((opcion, index) => (
                     <option key={index} value={opcion}>
@@ -384,7 +422,11 @@ function RegistroEmp() {
                     </option>
                   ))}
                 </select>
-                {fieldErrors.sueldoMensual && <span className="field-error">{fieldErrors.sueldoMensual}</span>}
+                {fieldErrors.sueldoMensual && (
+                  <span className="field-error">
+                    {fieldErrors.sueldoMensual}
+                  </span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="cedula">CÉDULA:</label>
@@ -397,12 +439,13 @@ function RegistroEmp() {
                   required
                   maxLength="10"
                   pattern="\d{10}"
-                  className={fieldErrors.cedula ? 'error-input' : ''}
+                  className={fieldErrors.cedula ? "error-input" : ""}
                 />
-                {fieldErrors.cedula && <span className="field-error">{fieldErrors.cedula}</span>}
+                {fieldErrors.cedula && (
+                  <span className="field-error">{fieldErrors.cedula}</span>
+                )}
               </div>
             </div>
-            
             {/* Información de Contacto */}
             <div className="form-section">
               <h3>Datos de Contacto</h3>
@@ -415,9 +458,11 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.direccion}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.direccion ? 'error-input' : ''}
+                  className={fieldErrors.direccion ? "error-input" : ""}
                 />
-                {fieldErrors.direccion && <span className="field-error">{fieldErrors.direccion}</span>}
+                {fieldErrors.direccion && (
+                  <span className="field-error">{fieldErrors.direccion}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="telefono">TELÉFONO:</label>
@@ -427,9 +472,11 @@ function RegistroEmp() {
                   name="telefono"
                   value={nuevoEmprendedor.telefono}
                   onChange={handleInputChange}
-                  className={fieldErrors.telefono ? 'error-input' : ''}
+                  className={fieldErrors.telefono ? "error-input" : ""}
                 />
-                {fieldErrors.telefono && <span className="field-error">{fieldErrors.telefono}</span>}
+                {fieldErrors.telefono && (
+                  <span className="field-error">{fieldErrors.telefono}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="celular">CELULAR:</label>
@@ -440,9 +487,11 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.celular}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.celular ? 'error-input' : ''}
+                  className={fieldErrors.celular ? "error-input" : ""}
                 />
-                {fieldErrors.celular && <span className="field-error">{fieldErrors.celular}</span>}
+                {fieldErrors.celular && (
+                  <span className="field-error">{fieldErrors.celular}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="correo">CORREO:</label>
@@ -453,12 +502,13 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.correo}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.correo ? 'error-input' : ''}
+                  className={fieldErrors.correo ? "error-input" : ""}
                 />
-                {fieldErrors.correo && <span className="field-error">{fieldErrors.correo}</span>}
+                {fieldErrors.correo && (
+                  <span className="field-error">{fieldErrors.correo}</span>
+                )}
               </div>
             </div>
-            
             {/* Información de la Empresa */}
             <div className="form-section">
               <h3>Datos de la Empresa</h3>
@@ -471,11 +521,12 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.ruc}
                   onChange={handleInputChange}
                   maxLength="13"
-                  pattern="\d{13}"
-                  className={fieldErrors.ruc ? 'error-input' : ''}
-                  placeholder="Opcional"
+                  placeholder="Opcional - Debe terminar con 001"
+                  className={fieldErrors.ruc ? "error-input" : ""}
                 />
-                {fieldErrors.ruc && <span className="field-error">{fieldErrors.ruc}</span>}
+                {fieldErrors.ruc && (
+                  <span className="field-error">{fieldErrors.ruc}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="tipoEmpresa">TIPO DE EMPRESA:</label>
@@ -485,14 +536,18 @@ function RegistroEmp() {
                   value={nuevoEmprendedor.tipoEmpresa}
                   onChange={handleInputChange}
                   required
-                  className={fieldErrors.tipoEmpresa ? 'error-input' : ''}
+                  className={fieldErrors.tipoEmpresa ? "error-input" : ""}
                 >
                   <option value="">Seleccione...</option>
                   {opcionesTipoEmpresa.map((opcion, index) => (
-                    <option key={index} value={opcion}>{opcion}</option>
+                    <option key={index} value={opcion}>
+                      {opcion}
+                    </option>
                   ))}
                 </select>
-                {fieldErrors.tipoEmpresa && <span className="field-error">{fieldErrors.tipoEmpresa}</span>}
+                {fieldErrors.tipoEmpresa && (
+                  <span className="field-error">{fieldErrors.tipoEmpresa}</span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="anoCreacionEmpresa">AÑO DE CREACIÓN:</label>
@@ -505,12 +560,17 @@ function RegistroEmp() {
                   required
                   min="1900"
                   max={new Date().getFullYear()}
-                  className={fieldErrors.anoCreacionEmpresa ? 'error-input' : ''}
+                  className={
+                    fieldErrors.anoCreacionEmpresa ? "error-input" : ""
+                  }
                 />
-                {fieldErrors.anoCreacionEmpresa && <span className="field-error">{fieldErrors.anoCreacionEmpresa}</span>}
+                {fieldErrors.anoCreacionEmpresa && (
+                  <span className="field-error">
+                    {fieldErrors.anoCreacionEmpresa}
+                  </span>
+                )}
               </div>
             </div>
-            
             {/* Información de Empleados */}
             <div className="form-section">
               <h3>Datos de Empleados</h3>
@@ -524,9 +584,13 @@ function RegistroEmp() {
                   onChange={handleInputChange}
                   min="0"
                   required
-                  className={fieldErrors.empleadosHombres ? 'error-input' : ''}
+                  className={fieldErrors.empleadosHombres ? "error-input" : ""}
                 />
-                {fieldErrors.empleadosHombres && <span className="field-error">{fieldErrors.empleadosHombres}</span>}
+                {fieldErrors.empleadosHombres && (
+                  <span className="field-error">
+                    {fieldErrors.empleadosHombres}
+                  </span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="empleadosMujeres">EMPLEADOS MUJERES:</label>
@@ -538,12 +602,18 @@ function RegistroEmp() {
                   onChange={handleInputChange}
                   min="0"
                   required
-                  className={fieldErrors.empleadosMujeres ? 'error-input' : ''}
+                  className={fieldErrors.empleadosMujeres ? "error-input" : ""}
                 />
-                {fieldErrors.empleadosMujeres && <span className="field-error">{fieldErrors.empleadosMujeres}</span>}
+                {fieldErrors.empleadosMujeres && (
+                  <span className="field-error">
+                    {fieldErrors.empleadosMujeres}
+                  </span>
+                )}
               </div>
               <div className="form-group">
-                <label htmlFor="rangoEdadEmpleados">RANGO DE EDAD EMPLEADOS:</label>
+                <label htmlFor="rangoEdadEmpleados">
+                  RANGO DE EDAD EMPLEADOS:
+                </label>
                 <select
                   id="rangoEdadEmpleados"
                   name="rangoEdadEmpleados"
@@ -561,11 +631,7 @@ function RegistroEmp() {
             </div>
           </div>
           <div className="button-group">
-            <button
-              type="submit"
-              className="submit-btn"
-              disabled={loading}
-            >
+            <button type="submit" className="submit-btn" disabled={loading}>
               {loading ? "Registrando..." : "REGISTRAR"}
             </button>
             <button
