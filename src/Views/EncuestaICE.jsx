@@ -212,7 +212,7 @@ const EncuestaICE = () => {
                     : num === 1
                     ? "No"
                     : num === 3
-                    ? "Moderadamente"
+                    ? "Medianamente"
                     : "Sí"}
                 </span>
               </div>

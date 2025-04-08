@@ -211,6 +211,22 @@
   background-color: #2980b9;
 }
 
+.prev-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #25c04c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.prev-button:hover {
+  background-color: #1d7c19;
+}
+
 /* Estilo para mensajes de éxito */
 .success-message {
   text-align: center;

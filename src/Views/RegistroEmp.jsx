@@ -32,7 +32,7 @@ function RegistroEmp() {
   });
 
   // Opciones para selects
-  const opcionesRangoEdad = ["18-25", "26-35", "36-45", "46-59", "60+"];
+  const opcionesRangoEdad = ["Ninguno","18-25", "26-35", "36-45", "46-59", "60+"];
   const opcionesRangoSueldo = ["0-460", "460-750", "750-1000", "1000+"];
   const opcionesNivelEstudio = [
     "Primaria",
