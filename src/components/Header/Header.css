@@ -1,6 +1,6 @@
 /* HEADER */
 .header {
-  width: 100%;
+  width: 110%;
   height: 120px; /* Altura fija para el header */
   position: fixed; /* Fijar en la parte superior */
   top: 0;
