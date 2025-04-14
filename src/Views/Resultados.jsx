@@ -22,7 +22,8 @@ const Resultados = () => {
   const [iepmData, setIepmData] = useState(null);
   const [showIEPM, setShowIEPM] = useState(false);
   const [encuestasIEPM, setEncuestasIEPM] = useState([]);
-  const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] = useState(null);
+  const [encuestaSeleccionadaIEPM, setEncuestaSeleccionadaIEPM] =
+    useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [comentarios, setComentarios] = useState("");
   const [showComentarios, setShowComentarios] = useState(false);
@@ -34,47 +35,58 @@ const Resultados = () => {
 
   // Comentarios predefinidos mejor organizados y explicados
   const comentariosPredefinidos = {
-    "Capacitación": [
+    Capacitación: [
       {
-        texto: "Capacitación en programas de formación empresarial - Desarrollo de competencias en gestión y administración",
-        explicacion: "Recomendado para fortalecer habilidades básicas de gestión"
+        texto:
+          "Capacitación en programas de formación empresarial - Desarrollo de competencias en gestión y administración",
+        explicacion:
+          "Recomendado para fortalecer habilidades básicas de gestión",
       },
       {
-        texto: "Capacitación en dirección estratégica - Enfoque en toma de decisiones y liderazgo organizacional",
-        explicacion: "Para emprendedores que necesitan mejorar su visión estratégica"
-      }
+        texto:
+          "Capacitación en dirección estratégica - Enfoque en toma de decisiones y liderazgo organizacional",
+        explicacion:
+          "Para emprendedores que necesitan mejorar su visión estratégica",
+      },
     ],
-    "Herramientas": [
+    Herramientas: [
       {
-        texto: "Herramientas económicas y financieras - Análisis financiero y gestión de recursos",
-        explicacion: "Esencial para mejorar la salud financiera del negocio"
+        texto:
+          "Herramientas económicas y financieras - Análisis financiero y gestión de recursos",
+        explicacion: "Esencial para mejorar la salud financiera del negocio",
       },
       {
-        texto: "Herramientas de tecnología e innovación - Aplicación de tecnologías emergentes en negocios",
-        explicacion: "Para mantenerse competitivo en el mercado actual"
-      }
+        texto:
+          "Herramientas de tecnología e innovación - Aplicación de tecnologías emergentes en negocios",
+        explicacion: "Para mantenerse competitivo en el mercado actual",
+      },
     ],
-    "Evaluación": [
+    Evaluación: [
       {
-        texto: "Evaluación del marco legal - Análisis de normativas y regulaciones para su cumplimiento",
-        explicacion: "Importante para evitar problemas legales"
+        texto:
+          "Evaluación del marco legal - Análisis de normativas y regulaciones para su cumplimiento",
+        explicacion: "Importante para evitar problemas legales",
       },
       {
-        texto: "Identificación de deficiencias en servicios municipales - Trabajo con gobiernos locales para mejorar servicios",
-        explicacion: "Relevante para negocios dependientes de infraestructura municipal"
-      }
-    ]
+        texto:
+          "Identificación de deficiencias en servicios municipales - Trabajo con gobiernos locales para mejorar servicios",
+        explicacion:
+          "Relevante para negocios dependientes de infraestructura municipal",
+      },
+    ],
   };
 
   // Cargar comentarios guardados al iniciar
   useEffect(() => {
-    const savedComentarios = localStorage.getItem(`comentarios_${idEmprendedor}`);
+    const savedComentarios = localStorage.getItem(
+      `comentarios_${idEmprendedor}`
+    );
     if (savedComentarios) {
       setComentarios(savedComentarios);
       const comentariosArray = savedComentarios
         .split("\n")
-        .filter(line => line.trim() !== "" && line.startsWith("- "))
-        .map(line => line.substring(2).trim());
+        .filter((line) => line.trim() !== "" && line.startsWith("- "))
+        .map((line) => line.substring(2).trim());
       setComentariosSeleccionados(comentariosArray);
     }
   }, [idEmprendedor]);
@@ -95,18 +107,20 @@ const Resultados = () => {
   useEffect(() => {
     const fetchIndicadoresDimensiones = async () => {
       try {
-        const response = await fetch("https://localhost:7075/api/PreguntasIepm/detailed");
+        const response = await fetch(
+          "https://localhost:7075/api/PreguntasIepm/detailed"
+        );
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${await response.text()}`);
         }
         const data = await response.json();
 
         const indicadoresUnicos = {};
-        data.forEach(pregunta => {
+        data.forEach((pregunta) => {
           if (!indicadoresUnicos[pregunta.indicador]) {
             indicadoresUnicos[pregunta.indicador] = {
               idCuestionario: pregunta.idCuestionario,
-              destinatario: pregunta.destinatario
+              destinatario: pregunta.destinatario,
             };
           }
         });
@@ -115,7 +129,7 @@ const Resultados = () => {
           ([nombre, info], index) => ({
             idIndicador: info.idCuestionario,
             nombre: nombre,
-            destinatario: info.destinatario
+            destinatario: info.destinatario,
           })
         );
 
@@ -124,11 +138,14 @@ const Resultados = () => {
         const dimensiones = [
           { idDimension: 1, nombre: "Dimensión Económica" },
           { idDimension: 2, nombre: "Dimensión Operacional" },
-          { idDimension: 3, nombre: "Dimensión de Innovación" }
+          { idDimension: 3, nombre: "Dimensión de Innovación" },
         ];
         setDimensionesInfo(dimensiones);
       } catch (error) {
-        console.error("Error al cargar información de indicadores y dimensiones:", error);
+        console.error(
+          "Error al cargar información de indicadores y dimensiones:",
+          error
+        );
       }
     };
 
@@ -139,7 +156,7 @@ const Resultados = () => {
   useEffect(() => {
     const fetchEncuestas = async () => {
       try {
-        setStatus(prev => ({ ...prev, loading: true, error: null }));
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await fetch(
           `https://localhost:7075/api/Encuesta/encuestas/${idEmprendedor}`
@@ -151,19 +168,19 @@ const Resultados = () => {
 
         const data = await response.json();
         setEncuestas(data);
-        setStatus(prev => ({ ...prev, loadedEncuestas: true }));
+        setStatus((prev) => ({ ...prev, loadedEncuestas: true }));
 
         if (data.length > 0) {
           setEncuestaSeleccionada(data[0].idEncuesta);
         } else {
-          setStatus(prev => ({ ...prev, loading: false }));
+          setStatus((prev) => ({ ...prev, loading: false }));
         }
       } catch (err) {
         console.error("Error al cargar encuestas ICE:", err);
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
           loading: false,
-          error: `Error al cargar encuestas ICE: ${err.message}`
+          error: `Error al cargar encuestas ICE: ${err.message}`,
         }));
       }
     };
@@ -175,7 +192,7 @@ const Resultados = () => {
   useEffect(() => {
     const fetchEncuestasIEPM = async () => {
       try {
-        setStatus(prev => ({ ...prev, loading: true, error: null }));
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await fetch(
           `https://localhost:7075/api/IepmCalculation/Encuestas/${idEmprendedor}`
@@ -193,12 +210,12 @@ const Resultados = () => {
         }
       } catch (err) {
         console.error("Error al cargar encuestas IEPM:", err);
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
-          error: `Error al cargar encuestas IEPM: ${err.message}`
+          error: `Error al cargar encuestas IEPM: ${err.message}`,
         }));
       } finally {
-        setStatus(prev => ({ ...prev, loading: false }));
+        setStatus((prev) => ({ ...prev, loading: false }));
       }
     };
 
@@ -211,7 +228,7 @@ const Resultados = () => {
       if (!encuestaSeleccionada) return;
 
       try {
-        setStatus(prev => ({ ...prev, loading: true, error: null }));
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         // Obtener datos del emprendedor
         const emprendedorRes = await fetch(
@@ -227,22 +244,22 @@ const Resultados = () => {
         if (!resultadosRes.ok) throw new Error("Error al cargar resultados");
 
         const resultadosData = await resultadosRes.json();
-        
+
         setResultados(resultadosData.resultados || []);
         setResumen(resultadosData.resumen || null); // Guardar el resumen del ICE
-        
-        setStatus(prev => ({
+
+        setStatus((prev) => ({
           ...prev,
           loading: false,
           loadedResultados: true,
-          error: null
+          error: null,
         }));
       } catch (err) {
         console.error("Error al cargar datos ICE:", err);
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
           loading: false,
-          error: `Error al cargar datos ICE: ${err.message}`
+          error: `Error al cargar datos ICE: ${err.message}`,
         }));
       }
     };
@@ -256,7 +273,7 @@ const Resultados = () => {
       if (!encuestaSeleccionadaIEPM) return;
 
       try {
-        setStatus(prev => ({ ...prev, loading: true, error: null }));
+        setStatus((prev) => ({ ...prev, loading: true, error: null }));
 
         const response = await fetch(
           `https://localhost:7075/api/IepmCalculation/Resultado/${idEmprendedor}/${encuestaSeleccionadaIEPM}`
@@ -269,12 +286,16 @@ const Resultados = () => {
         const data = await response.json();
 
         const getNombreIndicador = (idIndicador) => {
-          const indicador = indicadoresInfo.find(i => i.idIndicador === idIndicador);
+          const indicador = indicadoresInfo.find(
+            (i) => i.idIndicador === idIndicador
+          );
           return indicador ? indicador.nombre : `Indicador ${idIndicador}`;
         };
 
         const getNombreDimension = (idDimension) => {
-          const dimension = dimensionesInfo.find(d => d.idDimension === idDimension);
+          const dimension = dimensionesInfo.find(
+            (d) => d.idDimension === idDimension
+          );
           return dimension ? dimension.nombre : `Dimensión ${idDimension}`;
         };
 
@@ -282,50 +303,57 @@ const Resultados = () => {
           resultadoTotal: {
             puntaje: data.iepm?.iepm,
             valoracion: data.iepm?.valoracion,
-            criterio: data.accionMejora?.descripcion
+            criterio: data.accionMejora?.descripcion,
           },
-          porDimension: data.dimensiones?.map(d => ({
+          porDimension: data.dimensiones?.map((d) => ({
             idDimension: d.idDimension,
             dimension: getNombreDimension(d.idDimension),
             puntaje: d.valor,
-            porcentaje: (d.valor / 5) * 100
+            porcentaje: (d.valor / 5) * 100,
           })),
-          porIndicador: data.indicadores?.map(i => ({
+          porIndicador: data.indicadores?.map((i) => ({
             idIndicador: i.idIndicador,
             indicador: getNombreIndicador(i.idIndicador),
             idDimension: Math.ceil(i.idIndicador / 3),
             dimension: getNombreDimension(Math.ceil(i.idIndicador / 3)),
             puntaje: i.valor,
-            porcentaje: (i.valor / 5) * 100
+            porcentaje: (i.valor / 5) * 100,
           })),
           accionRecomendada: {
             descripcion: data.accionMejora?.descripcion,
             recomendaciones: data.accionMejora?.recomendaciones,
-            rango: `${data.accionMejora?.rangoMin}-${data.accionMejora?.rangoMax}`
-          }
+            rango: `${data.accionMejora?.rangoMin}-${data.accionMejora?.rangoMax}`,
+          },
         };
 
         setIepmData(transformedData);
         setShowIEPM(true);
       } catch (error) {
         console.error("Error al cargar resultados IEPM:", error);
-        setStatus(prev => ({
+        setStatus((prev) => ({
           ...prev,
-          error: `Error al cargar IEPM: ${error.message}`
+          error: `Error al cargar IEPM: ${error.message}`,
         }));
       } finally {
-        setStatus(prev => ({ ...prev, loading: false }));
+        setStatus((prev) => ({ ...prev, loading: false }));
       }
     };
 
     fetchIEPMData();
-  }, [idEmprendedor, encuestaSeleccionadaIEPM, indicadoresInfo, dimensionesInfo]);
+  }, [
+    idEmprendedor,
+    encuestaSeleccionadaIEPM,
+    indicadoresInfo,
+    dimensionesInfo,
+  ]);
 
   // Función para obtener valor de competencia
   const getValorCompetencia = (idCompetencia) => {
     if (!resultados || resultados.length === 0) return "N/A";
-    const resultado = resultados.find(r => r.idCompetencia === idCompetencia);
-    return resultado ? resultado.puntuacionCompetencia?.toFixed(2) || "0.00" : "N/A";
+    const resultado = resultados.find((r) => r.idCompetencia === idCompetencia);
+    return resultado
+      ? resultado.puntuacionCompetencia?.toFixed(2) || "0.00"
+      : "N/A";
   };
 
   // Función para calcular ICE General (MODIFICADA)
@@ -348,7 +376,8 @@ const Resultados = () => {
         valoracion: "Mediana competencia",
         acciones: "Se cumple con las competencias básicas",
       };
-    } else if (iceGeneral >= 0.8 && iceGeneral <= 1.0001) { // Ajuste para 1.00001
+    } else if (iceGeneral >= 0.8 && iceGeneral <= 1.0001) {
+      // Ajuste para 1.00001
       return {
         nivel: "Alto",
         valoracion: "Alta competencia",
@@ -366,7 +395,9 @@ const Resultados = () => {
   // Función para manejar la impresión
   const handlePrint = () => {
     const originalTitle = document.title;
-    document.title = `Resultados_${emprendedor?.nombre || "Emprendedor"}_${new Date().toLocaleDateString()}`;
+    document.title = `Resultados_${
+      emprendedor?.nombre || "Emprendedor"
+    }_${new Date().toLocaleDateString()}`;
 
     const header = document.querySelector("header");
     const sidebar = document.querySelector(".sidebar-container");
@@ -375,7 +406,7 @@ const Resultados = () => {
     if (sidebar) sidebar.style.display = "none";
 
     const pieSlices = document.querySelectorAll(".pie-slice");
-    pieSlices.forEach(slice => {
+    pieSlices.forEach((slice) => {
       slice.style.webkitPrintColorAdjust = "exact";
       slice.style.printColorAdjust = "exact";
     });
@@ -394,9 +425,12 @@ const Resultados = () => {
   // Funciones para manejar comentarios (mejoradas)
   const agregarComentario = (comentario) => {
     if (!comentariosSeleccionados.includes(comentario.texto)) {
-      setComentariosSeleccionados([...comentariosSeleccionados, comentario.texto]);
-      
-      const nuevoComentario = comentarios 
+      setComentariosSeleccionados([
+        ...comentariosSeleccionados,
+        comentario.texto,
+      ]);
+
+      const nuevoComentario = comentarios
         ? `${comentarios}\n- ${comentario.texto}`
         : `- ${comentario.texto}`;
       setComentarios(nuevoComentario);
@@ -407,7 +441,7 @@ const Resultados = () => {
     const nuevosComentarios = [...comentariosSeleccionados];
     nuevosComentarios.splice(index, 1);
     setComentariosSeleccionados(nuevosComentarios);
-    setComentarios(nuevosComentarios.map(c => `- ${c}`).join("\n"));
+    setComentarios(nuevosComentarios.map((c) => `- ${c}`).join("\n"));
   };
 
   const guardarComentarios = () => {
@@ -424,7 +458,10 @@ const Resultados = () => {
         <div className="error-message">
           <h3>Error</h3>
           <p>{status.error}</p>
-          <button onClick={() => window.location.reload()} className="reload-button">
+          <button
+            onClick={() => window.location.reload()}
+            className="reload-button"
+          >
             Reintentar
           </button>
         </div>
@@ -470,11 +507,19 @@ const Resultados = () => {
     "Pensamiento Estratégico",
     "Proyección Social",
     "Orientación Financiera",
-    "Orientación Tecnológica e innovación"
+    "Orientación Tecnológica e innovación",
   ];
   const colors = [
-    "#FF6E6E", "#D05AFF", "#6A8CFF", "#4DDBFF", "#7CFFCB",
-    "#F4FF81", "#FFE066", "#FF9E66", "#FF7BAC", "#66FFA6"
+    "#FF6E6E",
+    "#D05AFF",
+    "#6A8CFF",
+    "#4DDBFF",
+    "#7CFFCB",
+    "#F4FF81",
+    "#FFE066",
+    "#FF9E66",
+    "#FF7BAC",
+    "#66FFA6",
   ];
 
   return (
@@ -496,13 +541,18 @@ const Resultados = () => {
             </p>
             <p>
               <strong>Fecha de generación:</strong>{" "}
-              <span className="data-box">{new Date().toLocaleDateString()}</span>
+              <span className="data-box">
+                {new Date().toLocaleDateString()}
+              </span>
             </p>
             {resultados.length > 0 && (
               <p>
                 <strong>Fecha de evaluación:</strong>{" "}
                 <span className="data-box">
-                  {new Date(encuestas.find(e => e.idEncuesta === encuestaSeleccionada)?.fechaEvaluacion || new Date()).toLocaleDateString()}
+                  {new Date(
+                    encuestas.find((e) => e.idEncuesta === encuestaSeleccionada)
+                      ?.fechaEvaluacion || new Date()
+                  ).toLocaleDateString()}
                 </span>
               </p>
             )}
@@ -516,12 +566,14 @@ const Resultados = () => {
             <select
               id="select-encuesta-ice"
               value={encuestaSeleccionada || ""}
-              onChange={(e) => setEncuestaSeleccionada(parseInt(e.target.value))}
+              onChange={(e) =>
+                setEncuestaSeleccionada(parseInt(e.target.value))
+              }
               disabled={status.loading}
             >
-              {encuestas.map(encuesta => (
+              {encuestas.map((encuesta) => (
                 <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
-                  Encuesta {encuesta.idEncuesta} - {new Date(encuesta.fechaEvaluacion).toLocaleDateString()}
+                  {new Date(encuesta.fechaEvaluacion).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -534,12 +586,14 @@ const Resultados = () => {
             <select
               id="select-encuesta-iepm"
               value={encuestaSeleccionadaIEPM || ""}
-              onChange={(e) => setEncuestaSeleccionadaIEPM(parseInt(e.target.value))}
+              onChange={(e) =>
+                setEncuestaSeleccionadaIEPM(parseInt(e.target.value))
+              }
               disabled={status.loading}
             >
-              {encuestasIEPM.map(encuesta => (
+              {encuestasIEPM.map((encuesta) => (
                 <option key={encuesta.idEncuesta} value={encuesta.idEncuesta}>
-                  Encuesta {encuesta.idEncuesta} - {new Date(encuesta.fechaAplicacion).toLocaleDateString()}
+                  {new Date(encuesta.fechaAplicacion).toLocaleDateString()}
                 </option>
               ))}
             </select>
@@ -583,9 +637,14 @@ const Resultados = () => {
             <div className="pie-chart-wrapper">
               <div className="pie-chart">
                 {resultados.map((resultado, index) => {
-                  const percentage = (resultado.puntuacionCompetencia / calcularIceGeneral()) * 100;
+                  const percentage =
+                    (resultado.puntuacionCompetencia / calcularIceGeneral()) *
+                    100;
                   const offset = resultados.slice(0, index).reduce((acc, r) => {
-                    return acc + (r.puntuacionCompetencia / calcularIceGeneral()) * 360;
+                    return (
+                      acc +
+                      (r.puntuacionCompetencia / calcularIceGeneral()) * 360
+                    );
                   }, 0);
 
                   return (
@@ -595,12 +654,12 @@ const Resultados = () => {
                       style={{
                         backgroundColor: colors[index],
                         transform: `rotate(${offset}deg)`,
-                        clipPath: `conic-gradient(${colors[index]} 0% ${percentage}%, transparent ${percentage}% 100%)`
+                        clipPath: `conic-gradient(${colors[index]} 0% ${percentage}%, transparent ${percentage}% 100%)`,
                       }}
                       onMouseEnter={() =>
                         setActiveTooltip({
                           competencia: competenciasNombres[index],
-                          percentage: percentage.toFixed(1)
+                          percentage: percentage.toFixed(1),
                         })
                       }
                       onMouseLeave={() => setActiveTooltip(null)}
@@ -611,7 +670,9 @@ const Resultados = () => {
 
               <div className="pie-legend print-pie-legend">
                 {resultados.map((resultado, index) => {
-                  const percentage = (resultado.puntuacionCompetencia / calcularIceGeneral()) * 100;
+                  const percentage =
+                    (resultado.puntuacionCompetencia / calcularIceGeneral()) *
+                    100;
 
                   return (
                     <div key={resultado.idCompetencia} className="legend-item">
